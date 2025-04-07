@@ -43,30 +43,8 @@
           "Microsoft.Windows.SDK.Win32Metadata": "60.0.34-preview"
         }
       },
-      "PeNet": {
-        "type": "Transitive",
-        "resolved": "4.1.5",
-        "contentHash": "XgPDrrm8in/oYPTp7hSLMNax+jfc2X6VoNsMuiFadGFDF8VBU+rLn7nI/0I5o1pflgt4Hh5JPo7u8PMCaFC1ug==",
-        "dependencies": {
-          "PeNet.Asn1": "2.0.1",
-          "System.Security.Cryptography.Pkcs": "8.0.1"
-        }
-      },
-      "PeNet.Asn1": {
-        "type": "Transitive",
-        "resolved": "2.0.1",
-        "contentHash": "YR2O2YokSAYB+7CXkCDN3bd6/p0K3/AicCPkOJHKUz500v1D/hulCuVlggguqNc3M0LgSfOZKGvVYg2ud1GA9A=="
-      },
-      "System.Security.Cryptography.Pkcs": {
-        "type": "Transitive",
-        "resolved": "8.0.1",
-        "contentHash": "CoCRHFym33aUSf/NtWSVSZa99dkd0Hm7OCZUxORBjRB16LNhIEOf8THPqzIYlvKM0nNDAPTRBa1FxEECrgaxxA=="
-      },
       "unscrambler": {
-        "type": "Project",
-        "dependencies": {
-          "PeNet": "[4.1.5, )"
-        }
+        "type": "Project"
       }
     }
   }
