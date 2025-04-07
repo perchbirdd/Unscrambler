@@ -166,7 +166,7 @@ public unsafe class Unscrambler72h1 : IUnscrambler
             // - ActionEffect4?
             case true when opcode == _constants.ObfuscatedOpcodes["ActionEffect04"]:
             {
-                UnscrambleActionEffect(data, 4, baseKey, -22105);
+                UnscrambleActionEffect(data, 4, baseKey, 22105);
                 break;
             }
             // Actually unknown
@@ -175,7 +175,7 @@ public unsafe class Unscrambler72h1 : IUnscrambler
                 *(uint *)(data + 28) -= baseKey;
                 
                 var opOffset = 66;
-                var shortKey = (short) (baseKey - 1255);
+                var shortKey = (short) (baseKey + 1255);
                 var targetCount = 1;
                 for (int i = 0; i < 8 * targetCount; i++)
                 {

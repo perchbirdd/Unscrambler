@@ -14,7 +14,7 @@ public partial class GameConstants
             MidTableOffset = 0x2168AE0,
             MidTableSize = 1708 + 4,
             DayTableOffset = 0x21A1960,
-            DayTableSize = 152,
+            DayTableSize = (0x25 + 1) * 4,
             ObfuscationEnabledMode = 224,
             InitZoneOpcode = 0x27C,
             ObfuscatedOpcodes = new Dictionary<string, int>

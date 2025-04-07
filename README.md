@@ -415,8 +415,8 @@ setResult = table1[105 * (nSeed2 % 0x7Fu) + *(_DWORD *)((char *)&midTable + midI
 
 These set values above are the radix and max for table1. Doing this for each table will give you 3 radixes and 3 maxes.
 
-The daytable is likely not going to change in size, but IDA will also tell you that. Its size will likely stay 37 * 4 
-bytes.
+IDA for some reason does not display the daytable size. But you can define it by a function of the epochDay mod - the
+length is `(epochDayMod + 1) * 4` provided it stays a table of 4-byte ints.
 
 The midtable's size is important because the length is used in this library to replace a runtime constant. But, you can
 also compute the size, either via IDA, or by looking at the decompilation:
