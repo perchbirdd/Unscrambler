@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="PeNet" Version="4.1.5" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="Data\2025.03.27.0000.0000\daytable.bin" />
+      <EmbeddedResource Include="Data\2025.03.27.0000.0000\daytable.bin" LogicalName="2025.03.27.0000.0000.daytable.bin"/>
+      <None Remove="Data\2025.03.27.0000.0000\midtable.bin" />
+      <EmbeddedResource Include="Data\2025.03.27.0000.0000\midtable.bin" LogicalName="2025.03.27.0000.0000.midtable.bin"/>
+      <None Remove="Data\2025.03.27.0000.0000\table0.bin" />
+      <EmbeddedResource Include="Data\2025.03.27.0000.0000\table0.bin" LogicalName="2025.03.27.0000.0000.table0.bin"/>
+      <None Remove="Data\2025.03.27.0000.0000\table1.bin" />
+      <EmbeddedResource Include="Data\2025.03.27.0000.0000\table1.bin" LogicalName="2025.03.27.0000.0000.table1.bin"/>
+      <None Remove="Data\2025.03.27.0000.0000\table2.bin" />
+      <EmbeddedResource Include="Data\2025.03.27.0000.0000\table2.bin" LogicalName="2025.03.27.0000.0000.table2.bin"/>
+    </ItemGroup>
+</Project>
