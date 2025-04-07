@@ -1,45 +1,24 @@
 ﻿using System.Reflection;
-using Microsoft.VisualBasic.CompilerServices;
-using PeNet.Header.Resource;
+using Unscrambler.Constants;
 
-namespace Unscrambler;
+namespace Unscrambler.Derivation.Versions;
 
-public class KeyGenerator
+public class KeyGenerator72h1 : IKeyGenerator
 {
     public bool ObfuscationEnabled { get; set; }
     public byte[] Keys { get; set; }
  
-    private readonly VersionConstants _constants;
+    private VersionConstants _constants;
     private int[] _table0 = [];
     private int[] _table1 = [];
     private int[] _table2 = [];
     private byte[] _midTable = [];
     private byte[] _dayTable = [];
 
-    /// <summary>
-    /// Create a new KeyGenerator for a game version with constants provided by the Unscrambler library.
-    /// </summary>
-    /// <param name="gameVersion">The game version.</param>
-    public KeyGenerator(string gameVersion)
-    {
-        _constants = VersionConstants.Constants[gameVersion];
-        Keys = new byte[3];
-
-        LoadTables();
-    }
-
-    /// <summary>
-    /// Create a new KeyGenerator for a game version by providing your own constants and base path for table binaries.
-    /// KeyGenerator requires ObfuscationEnabledMode, TableRadixes, and TableMax to be defined, and expects "table0.bin",
-    /// "table1.bin", "table2.bin", "midtable.bin" and "daytable.bin" in the provided path.
-    /// </summary>
-    /// <param name="constants">The constants to initialize the key generator with.</param>
-    /// <param name="tableBinaryBasePath">The path containing table binaries.</param>
-    public KeyGenerator(VersionConstants constants, string tableBinaryBasePath)
+    public void Initialize(VersionConstants constants, string? tableBinaryBasePath = null)
     {
         _constants = constants;
         Keys = new byte[3];
-        
         LoadTables(tableBinaryBasePath);
     }
     

@@ -1,4 +1,6 @@
-﻿namespace Unscrambler.Unscramble;
+﻿using Unscrambler.Constants;
+
+namespace Unscrambler.Unscramble;
 
 public interface IUnscrambler
 {

@@ -39,4 +39,8 @@
   <ItemGroup>
     <ProjectReference Include="..\Unscrambler\Unscrambler.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="LICENSE" />
+  </ItemGroup>
 </Project>

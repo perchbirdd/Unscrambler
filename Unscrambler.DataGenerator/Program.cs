@@ -1,6 +1,7 @@
 ﻿using System.Text.Json.Serialization;
 using PeNet;
 using Unscrambler;
+using Unscrambler.Constants;
 
 public class Program
 {

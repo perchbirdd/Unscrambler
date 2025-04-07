@@ -152,8 +152,8 @@ The fourth part and fifth part is setResult and their tables. Each table is a va
 middle of this excerpt that these values are defined as "radix" and "max". I don't know enough math to describe this 
 well, but to me, it looks like these tables are indexes using custom bases. That is, seed2 defines the Nths place, 
 and seed1 defines the N-1ths place, where N is `TableRadixes[set]`. Does this make sense? No idea, but 
-`TableRadixes[0] * TableMax[0] = sizeof(table0)` so it sure made sense to me. As for the values in these tables, I have
-absolutely no idea what they are. They just look like random ints constrained to 2 bytes.
+`TableRadixes[0] * TableMax[0] = sizeof(table0) / 4` so it sure made sense to me. As for the values in these tables, I
+have absolutely no idea what they are. They just look like random ints constrained to 2 bytes.
 
 Finally, seed1 is added to midTableValue which is added to dayTableValue which is added to setResult, and all truncated 
 into one byte. That is the key for this set.
@@ -286,7 +286,7 @@ case 0x3A4u: // PlayerSpawn opcode
   // Player equipment
   intKey = key + 118426275;
   for (int i = 556; i < 556 + 10; i++) {
-    *(int32 *)(v77 + i) ^= intKey;
+    *(int32 *)(data + i) ^= intKey;
   }
   break;
 ```
@@ -321,11 +321,11 @@ perform hooking may do funky things in order to provide `rsi` from within your h
 other applications hooking the same location. Furthermore, even if you do get the data from this position, there are a 
 number of new concerns to address. Packet ordering is one, where in order to maintain the actual order of incoming and
 outgoing frames, you must delay processing an early frame until CreateTarget is hit, so you can read the packet from
-`rsi` and fill in the missing data before considering the frame complete. Another concern is actually bugs in the game
-- there is a certain IPC packet the server sends the client every 10 seconds, and if you happen to switch zones and 
-- receive a type 2 packet (IPC is type 3), the game will send you both in the same frame - but it will not call 
-- CreateTarget on this IPC packet. If the game sends you this packet outside of a frame with a type 2 packet, it will 
-- call CreateTarget on it. I was tired of the constant workarounds to ensure the integrity of my data.
+`rsi` and fill in the missing data before considering the frame complete. Another concern is actually bugs in the
+game - there is a certain IPC packet the server sends the client every 10 seconds, and if you happen to switch zones
+and receive a type 2 packet (IPC is type 3), the game will send you both in the same frame - but it will not call
+CreateTarget on this IPC packet. If the game sends you this packet outside of a frame with a type 2 packet, it will 
+call CreateTarget on it. I was tired of the constant workarounds to ensure the integrity of my data.
 
 # Using the library
 
@@ -333,7 +333,7 @@ The functionality is condensed into two classes, `KeyGenerator` and `Unscrambler
 
 You obtain a `KeyGenerator` like so:
 ```csharp
-var keyGenerator = new KeyGenerator("2025.03.27.0000.0000");
+var keyGenerator = KeyGeneratorFactory.ForGameVersion("2025.03.27.0000.0000");
 ```
 and you feed it InitZone packets like so:
 ```csharp
@@ -351,7 +351,7 @@ if (packet.Opcode == VersionConstants.ForGameVersion("2025.03.27.0000.0000").Ini
 
 You obtain an instance of `Unscrambler` like so:
 ```csharp
-var unscrambler = UnscramblerFactory.ForVersion("2025.03.27.0000.0000");
+var unscrambler = UnscramblerFactory.ForGameVersion("2025.03.27.0000.0000");
 ```
 This is because the library will provide a dedicated implementation of IUnscrambler for each game version requested. 
 
@@ -363,19 +363,79 @@ unscrambler.Unscramble(packetData, keyGenerator.Keys[0], keyGenerator.Keys[1], k
 The unscrambler will deobfuscate the packet in-place. Note that the provided data must start at the IPC header. Not 
 after the IPC header, but at the IPC header, as the function will obtain the opcode by accessing `data[2]`.
 
+## Extra considerations
+
+The game client does not reset its generated keys between logins. Consider the following scenario:
+
+1. Log in
+2. Receive StatusEffectList3
+   - This is not obfuscated, as you have just logged in and no keys have been generated
+3. Receive InitZone
+   - Keys are now generated
+4. Do things in-game
+5. Log out
+6. Log in
+7. Receive StatusEffectList3
+   - This packet is obfuscated with keys from the last InitZone received
+8. Receive InitZone
+   - New keys have been generated
+
+Furthermore, care must be taken when generating keys and processing packets at a later time. For example, you may get
+into a situation where a packet is being deobfuscated with new keys due to an error in the order of operations of
+generating keys and deobfuscating the packet.
+
 # DataGenerator
 
 This repository comes with a project called Unscrambler.DataGenerator. Provided the appropriate values, this 
 application will read the necessary key derivation tables from the executable and dump them into files to be
 included in the library as constants. It's provided for convenience and my own use for updating the library.
 
+## Updating values for DataGenerator
+
+DataGenerator requires a set of constants in order to run. These are the table offsets and the table sizes.
+
+If you look at the `derive` function in IDA, you will see the 5 tables referenced in an obvious fashion. There is an
+example of this above in this README. If you click through to any of the set tables, you will see something like:
+```asm
+; int table1[13336]
+table1          dd 1617h                ; DATA XREF: derive+169↑r
+                db    4
+                db  0Ch
+                db    0
+                db    0
+                db  70h ; p
+```
+This shows the position of the table in the executable, and the length of the table in 32-bit integers. However, you
+can also use the set code to determine the length:
+
+```c++
+setResult = table1[105 * (nSeed2 % 0x7Fu) + *(_DWORD *)((char *)&midTable + midIndex) * (unsigned int)nSeed1 % 0x69];
+```
+`0x69 * 0x7F = 105 * 127 = 13335` (Not sure why it's off by one, I thought this worked perfectly)
+
+These set values above are the radix and max for table1. Doing this for each table will give you 3 radixes and 3 maxes.
+
+The daytable is likely not going to change in size, but IDA will also tell you that. Its size will likely stay 37 * 4 
+bytes.
+
+The midtable's size is important because the length is used in this library to replace a runtime constant. But, you can
+also compute the size, either via IDA, or by looking at the decompilation:
+```c++
+midIndex = 8LL * (nSeed1 % 0xD5u);
+```
+This shows the midtable has a max index of 0xD5 (213), so it has 214 entries and has 8-byte entries. The size is
+then 214 * 8 = 1712 bytes. The only odd thing is that IDA detects the beginning of the midtable as an int prior to an
+array of bytes, so just know that the use of the midtable in the set calculation is the correct base, not the array
+used in the return value, which is 4 bytes later.
+
 # Self-Test
 
 This repository comes with a project called Unscrambler.SelfTest. This is a Dalamud plugin that performs the 
 aforementioned `rsi` hooking in order to obtain the properly deobfuscated data from the game. It also loads all of the
-obfuscated opcodes and displays which opcodes were and were not successfully deobfuscated. It, again, is provided for 
-convenience and my own use for verifying that updated versions of the library are functioning as expected. If you are
-using this to test updates, note that there is likely no way to get the server to send a select few opcodes.
+obfuscated opcodes and displays which opcodes were and were not successfully deobfuscated. The code is very messy, but
+it was created to do one job and it does it well enough. It, again, is provided for convenience and my own use for
+verifying that updated versions of the library are functioning as expected. If you are using this to test updates,
+note that there is likely no way to get the server to send a select few opcodes.
 
 A general guideline is as follows:
 - PlayerSpawn: Change zone or encounter another player
@@ -383,8 +443,8 @@ A general guideline is as follows:
 - ActionEffect01: Observe an action that affects 1 target
 - ActionEffect08: Observe an action that affects 8 targets
 - ActionEffect16: Observe an action that affects 16 targets
-- ActionEffect24: Observe an action that affects 24 targets
-- ActionEffect32: Observe an action that affects 32 targets
+- ActionEffect24: Observe an action that affects 24 targets (hunts are good for this)
+- ActionEffect32: Observe an action that affects 32 targets (hunts are good for this)
 - StatusEffectList1: Observe a buff being applied
 - StatusEffectList3: Observe many buffs being applied (?)
 - Examine: Examine another player

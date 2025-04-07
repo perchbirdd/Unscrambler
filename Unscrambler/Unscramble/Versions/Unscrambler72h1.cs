@@ -1,4 +1,5 @@
 ﻿using System.Runtime.CompilerServices;
+using Unscrambler.Constants;
 
 namespace Unscrambler.Unscramble.Versions;
 
@@ -14,6 +15,9 @@ public unsafe class Unscrambler72h1 : IUnscrambler
     /// <inheritdoc cref="IUnscrambler"/>
     public void Unscramble(Span<byte> input, byte key0, byte key1, byte key2)
     {
+        // Ditch - something is uninitialized, and there's no way to know if it's on purpose or not
+        if (key0 == 0 && key1 == 0 && key2 == 0) return;
+        
         Span<uint> keys = stackalloc uint[3];
         keys[0] = key0;
         keys[1] = key1;

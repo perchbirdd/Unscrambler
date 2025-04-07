@@ -1,6 +1,6 @@
 ﻿using Unscrambler.Constants.Versions;
 
-namespace Unscrambler;
+namespace Unscrambler.Constants;
 
 public class VersionConstants
 {

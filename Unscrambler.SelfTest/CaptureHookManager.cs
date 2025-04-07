@@ -5,6 +5,7 @@ using System.Security.Cryptography;
 using Dalamud.Hooking;
 using Dalamud.Plugin.Services;
 using Reloaded.Hooks.Definitions.X64;
+using Unscrambler.Derivation;
 using Unscrambler.SelfTest.Binary;
 using Unscrambler.SelfTest.Binary.Packet;
 using Unscrambler.Unscramble;
@@ -30,10 +31,10 @@ public unsafe class CaptureHookManager : IDisposable
 	private readonly IPluginLog _log;
 	private readonly PluginState _state;
 	private readonly IUnscrambler _unscrambler;
+	private readonly IKeyGenerator _keyGenerator;
 
 	private bool _ignoreCreateTarget;
 	private readonly Queue<QueuedPacket> _zoneRxIpcQueue;
-	private readonly KeyGenerator _keyGenerator;
 
 	public CaptureHookManager(
 		IPluginLog log,
@@ -44,8 +45,8 @@ public unsafe class CaptureHookManager : IDisposable
 		_log = log;
 		_state = state;
 		
-		_unscrambler = UnscramblerFactory.ForVersion(Plugin.GameVersion);
-		_keyGenerator = new KeyGenerator(Plugin.GameVersion);
+		_unscrambler = UnscramblerFactory.ForGameVersion(Plugin.GameVersion);
+		_keyGenerator = KeyGeneratorFactory.ForGameVersion(Plugin.GameVersion);
 		
 		_zoneRxIpcQueue = new Queue<QueuedPacket>();
 		
@@ -112,12 +113,18 @@ public unsafe class CaptureHookManager : IDisposable
 
 			QueuedPacket? queuedPacket = null;
 			var opcode = *(ushort*)(packetPtr + 2);
-
+			
+			if (opcode == Plugin.Constants.InitZoneOpcode)
+			{
+				_log.Verbose($"[CreateTarget]: {opcode:X} InitZone :)");
+				return _createTargetHook.Original(entityId, packetPtr);;
+			}
+			
 			if (!_state.OpcodesNeeded.Contains(opcode))
 			{
 				return _createTargetHook.Original(entityId, packetPtr);
-			}
-
+			} 
+			
 			do
 			{
 				var packet = _zoneRxIpcQueue.Dequeue();
@@ -131,7 +138,7 @@ public unsafe class CaptureHookManager : IDisposable
 				return _createTargetHook.Original(entityId, packetPtr);
 			}
 
-			_log.Verbose($"[CreateTarget]: entity {entityId} meta source {queuedPacket.Source} size {queuedPacket.DataSize}");
+			_log.Verbose($"[CreateTarget]: entity {entityId} meta source {queuedPacket.Source} size {queuedPacket.DataSize} opcode {queuedPacket.Opcode:X}");
 
 			// Set the packet's data
 			var data = new Span<byte>((byte*)packetPtr, queuedPacket.DataSize);
@@ -226,7 +233,7 @@ public unsafe class CaptureHookManager : IDisposable
         var span = new Span<byte>(framePtr, (int)header.TotalSize);
         var data = span.Slice(headerSize, (int)header.TotalSize - headerSize);
         
-        _log.Verbose($"[{(nuint)framePtr:X}] [{proto}{direction}] proto {header.Protocol} unk {header.Unknown}, {header.Count} pkts size {header.TotalSize} usize {header.DecompressedLength}");
+        _log.Verbose($"[{(nuint)framePtr:X}] [{proto}{direction}] proto {header.Protocol} unk {header.Unknown}, {header.Count} pkts size {header.TotalSize} usize {header.DecompressedLength}{DispatcherDebugSuffix()}");
         
         // Compression
         if (header.Compression != CompressionType.None)
@@ -257,10 +264,11 @@ public unsafe class CaptureHookManager : IDisposable
             var opcode = BitConverter.ToUInt16(pktData[2..4]);
             queuedPacket.Opcode = opcode;
 
-            if (opcode == 636)
+            if (opcode == Plugin.Constants.InitZoneOpcode)
             {
 	            try
 	            {
+		            _log.Verbose($"generating keys");
 		            _keyGenerator.Generate(pktData);
 		            _state.ObfuscationEnabled = _keyGenerator.ObfuscationEnabled;
 		            _state.GeneratedKey1 = _keyGenerator.Keys[0];
@@ -282,7 +290,12 @@ public unsafe class CaptureHookManager : IDisposable
 	            // if you're not, you need to do it here.
 	            // If you don't, you may update keys before a packet prior to the InitZone could be unscrambled
 	            queuedPacket.UnscramblerData = pktData.ToArray();
-	            _unscrambler.Unscramble(queuedPacket.UnscramblerData, _keyGenerator.Keys[0], _keyGenerator.Keys[1], _keyGenerator.Keys[2]);
+	            if (_keyGenerator.ObfuscationEnabled)
+	            {
+		            _log.Verbose($"unscrambling {opcode:X}");
+		            _unscrambler.Unscramble(queuedPacket.UnscramblerData, _keyGenerator.Keys[0], _keyGenerator.Keys[1],
+			            _keyGenerator.Keys[2]);
+	            }
 	            queuedPacket.UnscramblerDataHash = HashPacket(queuedPacket.UnscramblerData);
 	            
 	            _zoneRxIpcQueue.Enqueue(queuedPacket);
@@ -291,9 +304,14 @@ public unsafe class CaptureHookManager : IDisposable
             var opcodeInfo = "";
             if (pktHdr.Type == PacketType.Ipc)
 	            opcodeInfo = $"opcode {opcode} ({opcode:X}), ";
-            _log.Verbose($"packet: type {pktHdr.Type}, {opcodeInfo}{pktHdr.Size} bytes, {pktHdr.SrcEntity} -> {pktHdr.DstEntity}");
+            _log.Verbose($"packet: type {pktHdr.Type}, {opcodeInfo}{pktHdr.Size} bytes, {pktHdr.SrcEntity} -> {pktHdr.DstEntity}{DispatcherDebugSuffix()}");
             offset += (int)pktHdr.Size;
         }
+    }
+
+    private string DispatcherDebugSuffix()
+    {
+	    return $"| {_state.ObfuscationEnabled} {_state.GeneratedKey1} {_state.GeneratedKey2} {_state.GeneratedKey3}";
     }
 
     private string HashPacket(Span<byte> data)

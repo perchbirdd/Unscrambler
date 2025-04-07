@@ -51,6 +51,12 @@ public class MainWindow : Window, IDisposable
         ImGui.TextUnformatted($"key1: {_state.GeneratedKey2}");
         ImGui.TextUnformatted($"key2: {_state.GeneratedKey3}");
         ImGui.Separator();
+        if (ImGui.Button("Clear"))
+        {
+            _state.OpcodeSuccesses.Clear();
+            _state.OpcodeFailures.Clear();
+        }
+        ImGui.Separator();
         
         using (var tb = ImRaii.Table("Opcodes", 3))
         {
