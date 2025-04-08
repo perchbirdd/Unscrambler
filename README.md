@@ -367,18 +367,24 @@ after the IPC header, but at the IPC header, as the function will obtain the opc
 
 The game client does not reset its generated keys between logins. Consider the following scenario:
 
-1. Log in
-2. Receive StatusEffectList3
-   - This is not obfuscated, as you have just logged in and no keys have been generated
-3. Receive InitZone
-   - Keys are now generated
-4. Do things in-game
-5. Log out
-6. Log in
-7. Receive StatusEffectList3
-   - This packet is obfuscated with keys from the last InitZone received
-8. Receive InitZone
-   - New keys have been generated
+1. ~~Log in~~
+2. ~~Receive StatusEffectList3~~
+   - ~~This is not obfuscated, as you have just logged in and no keys have been generated~~
+3. ~~Receive InitZone~~
+   - ~~Keys are now generated~~
+4. ~~Do things in-game~~
+5. ~~Log out~~
+6. ~~Log in~~
+7. ~~Receive StatusEffectList3~~
+   - ~~This packet is obfuscated with keys from the last InitZone received~~
+8. ~~Receive InitZone~~
+   - ~~New keys have been generated~~
+
+NOTE: This case technically is not valid due to research. The StatusEffectList3 sent by the client prior to InitZone
+is technically a "throwaway" packet. I do not know why they did this, but instead of sending it after InitZone or
+opting to not obfuscate this packet prior to InitZone, they decided to send a StatusEffectList3 prior to InitZone, and
+then again after InitZone. The first one is useless and gets corrupted by the previous session's deobfuscation keys,
+so they send it again after InitZone to actually provide the data.
 
 Furthermore, care must be taken when generating keys and processing packets at a later time. For example, you may get
 into a situation where a packet is being deobfuscated with new keys due to an error in the order of operations of
