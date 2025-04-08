@@ -44,7 +44,8 @@ public class MainWindow : Window, IDisposable
         ImGui.TextUnformatted($"unk: {dispatcher->Unknown_32}");
         
         ImGui.Separator();
-        ImGui.TextUnformatted("generated:");
+        ImGui.TextUnformatted("state keys:");
+        ImGui.TextUnformatted($"are keys from dispatcher? {_state.KeysFromDispatcher}");
         var enabled = _state.ObfuscationEnabled ? "Enabled" : "Disabled";
         ImGui.TextUnformatted($"mode: {enabled}");
         ImGui.TextUnformatted($"key0: {_state.GeneratedKey1}");

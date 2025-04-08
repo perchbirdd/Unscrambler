@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
@@ -32,6 +32,7 @@ public unsafe class CaptureHookManager : IDisposable
 	private readonly PluginState _state;
 	private readonly IUnscrambler _unscrambler;
 	private readonly IKeyGenerator _keyGenerator;
+	private bool _obfuscationOverride;
 
 	private bool _ignoreCreateTarget;
 	private readonly Queue<QueuedPacket> _zoneRxIpcQueue;
@@ -47,6 +48,32 @@ public unsafe class CaptureHookManager : IDisposable
 		
 		_unscrambler = UnscramblerFactory.ForGameVersion(Plugin.GameVersion);
 		_keyGenerator = KeyGeneratorFactory.ForGameVersion(Plugin.GameVersion);
+		
+		var dispatcher = _state.Dispatcher;
+		if (dispatcher != null)
+		{
+			var gameRandom = dispatcher->GameRandom;
+			var packetRandom = dispatcher->LastPacketRandom;
+			_keyGenerator.Keys[0] = (byte)(dispatcher->Key0 - gameRandom - packetRandom);
+			_keyGenerator.Keys[1] = (byte)(dispatcher->Key1 - gameRandom - packetRandom);
+			_keyGenerator.Keys[2] = (byte)(dispatcher->Key2 - gameRandom - packetRandom);
+			
+			_state.GeneratedKey1 = (byte)(dispatcher->Key0 - gameRandom - packetRandom);
+			_state.GeneratedKey2 = (byte)(dispatcher->Key1 - gameRandom - packetRandom);
+			_state.GeneratedKey3 = (byte)(dispatcher->Key2 - gameRandom - packetRandom);
+			
+			_state.KeysFromDispatcher = true;
+			_obfuscationOverride = dispatcher->Key0 >= gameRandom + packetRandom;
+			_state.ObfuscationEnabled = _obfuscationOverride;
+
+			_log.Debug($"[CaptureHooks] Obfuscation override is {_obfuscationOverride}");
+			_log.Debug($"[CaptureHooks] keys {dispatcher->Key0}, {dispatcher->Key1}, {dispatcher->Key2}");
+			_log.Debug($"[CaptureHooks] game random {dispatcher->GameRandom}, packet random {dispatcher->LastPacketRandom}");
+		}
+		else
+		{
+			_log.Debug("[CaptureHooks] Dispatcher was null, so not initializing keys");
+		}
 		
 		_zoneRxIpcQueue = new Queue<QueuedPacket>();
 		
@@ -274,6 +301,8 @@ public unsafe class CaptureHookManager : IDisposable
 		            _state.GeneratedKey1 = _keyGenerator.Keys[0];
 		            _state.GeneratedKey2 = _keyGenerator.Keys[1];
 		            _state.GeneratedKey3 = _keyGenerator.Keys[2];
+		            _state.KeysFromDispatcher = false;
+		            _obfuscationOverride = false;
 	            }
 	            catch (Exception e)
 	            {
@@ -290,7 +319,7 @@ public unsafe class CaptureHookManager : IDisposable
 	            // if you're not, you need to do it here.
 	            // If you don't, you may update keys before a packet prior to the InitZone could be unscrambled
 	            queuedPacket.UnscramblerData = pktData.ToArray();
-	            if (_keyGenerator.ObfuscationEnabled)
+	            if (_keyGenerator.ObfuscationEnabled || _obfuscationOverride)
 	            {
 		            _log.Verbose($"unscrambling {opcode:X}");
 		            _unscrambler.Unscramble(queuedPacket.UnscramblerData, _keyGenerator.Keys[0], _keyGenerator.Keys[1],

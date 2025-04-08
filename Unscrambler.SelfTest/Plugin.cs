@@ -43,11 +43,11 @@ public sealed unsafe class Plugin : IDalamudPlugin
         Constants = VersionConstants.ForGameVersion(GameVersion);
         
         _state = new PluginState();
-        var multiSigScanner = new MultiSigScanner(Log);
-        _captureHookManager = new CaptureHookManager(Log, multiSigScanner, _state, Hooks);
-
         var callback = Framework.Instance()->NetworkModuleProxy->ReceiverCallback;
         _state.Dispatcher = (PacketDispatcher*) &callback->PacketDispatcher;
+        
+        var multiSigScanner = new MultiSigScanner(Log);
+        _captureHookManager = new CaptureHookManager(Log, multiSigScanner, _state, Hooks);
         
         _mainWindow = new MainWindow(_state);
         _windowSystem =  new WindowSystem("Unscrambler.SelfTest");

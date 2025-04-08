@@ -7,6 +7,7 @@ public unsafe class PluginState
 {
     public PacketDispatcher* Dispatcher { get; set; }
 
+    public bool KeysFromDispatcher { get; set; }
     public bool ObfuscationEnabled { get; set; }
     public byte GeneratedKey1 { get; set; }
     public byte GeneratedKey2 { get; set; }
