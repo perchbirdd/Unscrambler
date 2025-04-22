@@ -3,7 +3,7 @@ using Unscrambler.Constants;
 
 namespace Unscrambler.Unscramble.Versions;
 
-public unsafe class Unscrambler72h1 : IUnscrambler
+public unsafe class Unscrambler72 : IUnscrambler
 {
     private VersionConstants _constants;
 

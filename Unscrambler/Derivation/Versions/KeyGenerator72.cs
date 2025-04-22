@@ -3,7 +3,7 @@ using Unscrambler.Constants;
 
 namespace Unscrambler.Derivation.Versions;
 
-public class KeyGenerator721 : IKeyGenerator
+public class KeyGenerator72 : IKeyGenerator
 {
     public bool ObfuscationEnabled { get; set; }
     public byte[] Keys { get; set; }
@@ -103,12 +103,12 @@ public class KeyGenerator721 : IKeyGenerator
 
     private void Derive(byte set, byte nSeed1, byte nSeed2, uint epoch)
     {
-        var midIndex = 8 * (nSeed1 % 126);
+        var midIndex = 8 * (nSeed1 % (_midTable.Length / 8));
         var midTableValue = _midTable[4 + midIndex];
         var midValue = BitConverter.ToUInt32(_midTable, midIndex);
         
         var epochDays = 3 * (epoch / 60 / 60 / 24);
-        var dayTableIndex = 4 * (epochDays % 14);
+        var dayTableIndex = 4 * (epochDays % (_dayTable.Length / 4));
         var dayTableValue = _dayTable[dayTableIndex];
 
         var setRadix = _constants.TableRadixes[set];

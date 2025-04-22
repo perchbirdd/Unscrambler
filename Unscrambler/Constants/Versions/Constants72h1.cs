@@ -12,9 +12,9 @@ public partial class GameConstants
             TableRadixes = [116, 105, 101],
             TableMax = [166, 127, 250],
             MidTableOffset = 0x2168AE0,
-            MidTableSize = 1708 + 4,
+            MidTableSize = 213 * 8,
             DayTableOffset = 0x21A1960,
-            DayTableSize = (0x25 + 1) * 4,
+            DayTableSize = 37 * 4,
             ObfuscationEnabledMode = 224,
             InitZoneOpcode = 0x27C,
             ObfuscatedOpcodes = new Dictionary<string, int>
