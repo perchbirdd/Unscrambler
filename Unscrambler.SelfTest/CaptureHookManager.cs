@@ -300,6 +300,7 @@ public unsafe class CaptureHookManager : IDisposable
             {
 	            try
 	            {
+		            _testDataManager.SaveInitZone(pktData);
 		            _log.Verbose($"generating keys");
 		            _keyGenerator.Generate(pktData);
 		            _state.ObfuscationEnabled = _keyGenerator.ObfuscationEnabled;

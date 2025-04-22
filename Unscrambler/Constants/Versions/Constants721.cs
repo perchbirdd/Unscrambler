@@ -41,6 +41,9 @@ public partial class GameConstants
                 { "ActionEffect02", 0x6A },
                 { "ActionEffect04", 0x1BF }
             },
+            // unknowns:
+            // 1D4
+            // 9C
         };
     }
 }

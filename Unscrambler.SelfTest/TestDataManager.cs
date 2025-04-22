@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Unscrambler.Constants;
@@ -12,6 +13,9 @@ public class TestDataManager
     
     private HashSet<int> _opcodesToSave;
     private Dictionary<int, string> _opcodeNames;
+
+    private Guid _initZoneId;
+    private string _pathForSession;
     
     public TestDataManager(string path, VersionConstants constants)
     {
@@ -22,7 +26,7 @@ public class TestDataManager
         _opcodeNames = _constants.ObfuscatedOpcodes.ToDictionary(op => op.Value, op => op.Key);
         _opcodesToSave = _constants.ObfuscatedOpcodes.Select(op => op.Value).ToHashSet();
 
-        foreach (var file in Directory.EnumerateFiles(_path))
+        foreach (var file in Directory.EnumerateFiles(_path, "*.dat", SearchOption.AllDirectories))
         {
             var datName = Path.GetFileNameWithoutExtension(file);
             foreach (var (opcode, name) in _opcodeNames)
@@ -33,11 +37,20 @@ public class TestDataManager
             }
         }
     }
+    
+    public void SaveInitZone(Span<byte> initZonePacket)
+    {
+        _initZoneId = Guid.NewGuid();
+        _pathForSession = Path.Combine(_path, _initZoneId.ToString());
+        Directory.CreateDirectory(_pathForSession);
+        File.WriteAllBytes(Path.Combine(_pathForSession, $"InitZone-{_initZoneId}.dat"), initZonePacket);
+    }
 
     public void Save(int opcode, byte[] obfuscatedData, byte[] deobfuscatedData)
     {
-        File.WriteAllBytes(Path.Combine(_path, $"{_opcodeNames[opcode]}-obfuscated.dat"), obfuscatedData);
-        File.WriteAllBytes(Path.Combine(_path, $"{_opcodeNames[opcode]}-deobfuscated.dat"), deobfuscatedData);
+        if (!_opcodesToSave.Contains(opcode)) return;
+        File.WriteAllBytes(Path.Combine(_pathForSession, $"{_opcodeNames[opcode]}-obfuscated.dat"), obfuscatedData);
+        File.WriteAllBytes(Path.Combine(_pathForSession, $"{_opcodeNames[opcode]}-deobfuscated.dat"), deobfuscatedData);
         _opcodesToSave.Remove(opcode);
     }
 }
