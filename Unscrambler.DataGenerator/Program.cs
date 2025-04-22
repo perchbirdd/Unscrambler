@@ -31,7 +31,9 @@ public class Program
 
         var data = File.ReadAllBytes(args[0]);
         var peFile = new PeFile(data);
-        var outDir = args[1];
+        var baseOutDir = args[1];
+        var outDir = Path.Combine(baseOutDir, version);
+        Directory.CreateDirectory(outDir);
 
         var rData = peFile.ImageSectionHeaders!.First(s => s.Name == ".rdata");
         var adjustment = rData.VirtualAddress - rData.PointerToRawData;
