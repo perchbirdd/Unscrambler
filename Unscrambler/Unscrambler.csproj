@@ -14,10 +14,17 @@
         <EmbeddedResource Include="Data\2025.03.18.0000.0000\table0.bin" LogicalName="2025.03.18.0000.0000.table0.bin"/>
         <EmbeddedResource Include="Data\2025.03.18.0000.0000\table1.bin" LogicalName="2025.03.18.0000.0000.table1.bin"/>
         <EmbeddedResource Include="Data\2025.03.18.0000.0000\table2.bin" LogicalName="2025.03.18.0000.0000.table2.bin"/>
+        
         <EmbeddedResource Include="Data\2025.03.27.0000.0000\daytable.bin" LogicalName="2025.03.27.0000.0000.daytable.bin"/>
         <EmbeddedResource Include="Data\2025.03.27.0000.0000\midtable.bin" LogicalName="2025.03.27.0000.0000.midtable.bin"/>
         <EmbeddedResource Include="Data\2025.03.27.0000.0000\table0.bin" LogicalName="2025.03.27.0000.0000.table0.bin"/>
         <EmbeddedResource Include="Data\2025.03.27.0000.0000\table1.bin" LogicalName="2025.03.27.0000.0000.table1.bin"/>
         <EmbeddedResource Include="Data\2025.03.27.0000.0000\table2.bin" LogicalName="2025.03.27.0000.0000.table2.bin"/>
+        
+        <EmbeddedResource Include="Data\2025.04.16.0000.0000\daytable.bin" LogicalName="2025.04.16.0000.0000.daytable.bin"/>
+        <EmbeddedResource Include="Data\2025.04.16.0000.0000\midtable.bin" LogicalName="2025.04.16.0000.0000.midtable.bin"/>
+        <EmbeddedResource Include="Data\2025.04.16.0000.0000\table0.bin" LogicalName="2025.04.16.0000.0000.table0.bin"/>
+        <EmbeddedResource Include="Data\2025.04.16.0000.0000\table1.bin" LogicalName="2025.04.16.0000.0000.table1.bin"/>
+        <EmbeddedResource Include="Data\2025.04.16.0000.0000\table2.bin" LogicalName="2025.04.16.0000.0000.table2.bin"/>
     </ItemGroup>
 </Project>

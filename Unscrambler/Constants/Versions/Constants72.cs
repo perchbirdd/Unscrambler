@@ -36,7 +36,7 @@ public partial class GameConstants
                 { "UpdateGearset", 0x9E },
                 { "UpdateParty", 0x36F },
 
-                { "UnknownEffect1", 0x146 },
+                { "UnknownEffect01", 0x146 },
                 { "UnknownEffect16", 0x110 },
                 { "ActionEffect02", 0x1C5 },
                 { "ActionEffect04", 0x23C }
