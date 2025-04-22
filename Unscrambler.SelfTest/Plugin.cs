@@ -45,9 +45,12 @@ public sealed unsafe class Plugin : IDalamudPlugin
         _state = new PluginState();
         var callback = Framework.Instance()->NetworkModuleProxy->ReceiverCallback;
         _state.Dispatcher = (PacketDispatcher*) &callback->PacketDispatcher;
+
+        var testDataDir = Path.Combine(PluginInterface.GetPluginConfigDirectory(), GameVersion);
+        var testDataManager = new TestDataManager(testDataDir, Constants);
         
         var multiSigScanner = new MultiSigScanner(Log);
-        _captureHookManager = new CaptureHookManager(Log, multiSigScanner, _state, Hooks);
+        _captureHookManager = new CaptureHookManager(Log, multiSigScanner, _state, Hooks, testDataManager);
         
         _mainWindow = new MainWindow(_state);
         _windowSystem =  new WindowSystem("Unscrambler.SelfTest");

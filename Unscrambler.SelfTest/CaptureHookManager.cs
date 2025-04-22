@@ -30,6 +30,8 @@ public unsafe class CaptureHookManager : IDisposable
 
 	private readonly IPluginLog _log;
 	private readonly PluginState _state;
+	private readonly TestDataManager _testDataManager;
+	
 	private readonly IUnscrambler _unscrambler;
 	private readonly IKeyGenerator _keyGenerator;
 	private bool _obfuscationOverride;
@@ -41,10 +43,12 @@ public unsafe class CaptureHookManager : IDisposable
 		IPluginLog log,
 		MultiSigScanner multiScanner,
 		PluginState state,
-		IGameInteropProvider hooks)
+		IGameInteropProvider hooks,
+		TestDataManager testDataManager)
 	{
 		_log = log;
 		_state = state;
+		_testDataManager = testDataManager;
 		
 		_unscrambler = UnscramblerFactory.ForGameVersion(Plugin.GameVersion);
 		_keyGenerator = KeyGeneratorFactory.ForGameVersion(Plugin.GameVersion);
@@ -177,6 +181,7 @@ public unsafe class CaptureHookManager : IDisposable
 			if (queuedPacket.GameDataHash == queuedPacket.UnscramblerDataHash)
 			{
 				_state.MarkOpcode(queuedPacket.Opcode, true);
+				_testDataManager.Save(opcode, queuedPacket.ScrambledData, queuedPacket.UnscramblerData);
 			}
 			else
 			{
@@ -318,6 +323,7 @@ public unsafe class CaptureHookManager : IDisposable
 	            // Note that if you do want to unscramble using the game's keys, you need to do it later, in CreateTarget
 	            // if you're not, you need to do it here.
 	            // If you don't, you may update keys before a packet prior to the InitZone could be unscrambled
+	            queuedPacket.ScrambledData = pktData.ToArray();
 	            queuedPacket.UnscramblerData = pktData.ToArray();
 	            if (_keyGenerator.ObfuscationEnabled || _obfuscationOverride)
 	            {
