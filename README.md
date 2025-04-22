@@ -430,9 +430,10 @@ also compute the size, either via IDA, or by looking at the decompilation:
 midIndex = 8LL * (nSeed1 % 0xD5u);
 ```
 This shows the midtable has a max index of 0xD5 (213), so it has 214 entries and has 8-byte entries. The size is
-then 214 * 8 = 1712 bytes. The only odd thing is that IDA detects the beginning of the midtable as an int prior to an
-array of bytes, so just know that the use of the midtable in the set calculation is the correct base, not the array
-used in the return value, which is 4 bytes later.
+then 213 * 8 = 1704 bytes. The table seems to be padded to the next 16 byte increment if the result is shorter. The 
+only odd thing is that IDA detects the beginning of the midtable as an int prior to an array of bytes, so just know
+that the use of the midtable in the set calculation is the correct base, not the array used in the return value, which
+is 4 bytes later.
 
 # Self-Test
 
