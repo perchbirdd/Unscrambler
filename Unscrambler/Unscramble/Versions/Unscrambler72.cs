@@ -155,7 +155,14 @@ public unsafe class Unscrambler72 : IUnscrambler
                 }
                 break;
             }
-            
+            // ActorControl
+            case true when opcode == _constants.ObfuscatedOpcodes["ActorControl"]:
+            {
+                // If ActorControl is TargetIcon
+                if (*(ushort*)(data + 16) == 34)
+                    *(uint*)(data + 20) -= baseKey;
+                break;
+            }
             // --- Unknown opcodes ---
             // - ActionEffect2?
             case true when opcode == _constants.ObfuscatedOpcodes["ActionEffect02"]:

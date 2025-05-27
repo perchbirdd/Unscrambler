@@ -35,6 +35,7 @@ public partial class GameConstants
                 { "Examine", 0x87 },
                 { "UpdateGearset", 0x9E },
                 { "UpdateParty", 0x36F },
+                { "ActorControl", 0x208 },
 
                 { "UnknownEffect01", 0x146 },
                 { "UnknownEffect16", 0x110 },
