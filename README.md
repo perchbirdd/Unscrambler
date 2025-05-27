@@ -1,7 +1,25 @@
 # Unscrambler
 A library for deobfuscating packets for Final Fantasy XIV.
 
-## What is this?
+- [What is this?](#what-is-this)
+
+  - [How does the obfuscation work?](#how-does-the-obfuscation-work)
+  
+  - [The Workaround, and "Why not hooking?"](#the-workaround-and-why-not-hooking)
+
+- [Using the library](#using-the-library)
+
+  - [Extra considerations](#extra-considerations)
+
+- [DataGenerator](#datagenerator)
+
+  - [Updating values for DataGenerator](#updating-values-for-datagenerator)
+
+- [Self Test](#self-test)
+
+- [Important Notices](#important-notices)
+
+# What is this?
 In 7.2 (2025.03.18.0000.0000), released 3/25/2025, Square Enix implemented obfuscation for specific packets used in the
 game. Prior to 7.2, there were still a number of applications that used packet capture (Npcap, Sockets) rather than
 hooking game functions, in order to obtain packet data from the game. In the time since the release of 7.2, most 
@@ -464,3 +482,18 @@ A general guideline is as follows:
 - UnknownEffect16: Does not seem to be sent to the client
 
 ![](media/selftest.png)
+
+# Important Notices
+
+Important notices regarding data captured with this library will be posted here.
+
+### ActorControl
+
+From
+[its release on April 7th](https://github.com/perchbirdd/Unscrambler/commit/c1c4d0254f2b228e5a786b0b657576b8f1f79ea8) 
+until 
+[its update on May 27th](https://github.com/perchbirdd/Unscrambler/commit/7e947b314eedfade1d591d408407c48e8baabf9b), 
+this library did not handle ActorControl packets with the type
+`TargetIcon`, commonly known as headmarkers. Any actor control packets with the TargetIcon type must either be
+deobfuscated after-the-fact by regenerating keys from InitZone packets, deriving the keys some other way, or entirely 
+ignored. I apologize for any inconvenience.
