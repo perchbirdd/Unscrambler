@@ -17,6 +17,8 @@ public unsafe class PluginState
     
     public Dictionary<int, int> OpcodeSuccesses { get; init; }
     public Dictionary<int, int> OpcodeFailures { get; init; }
+    
+    public int TargetingHaters { get; set; }
 
     public PluginState()
     {

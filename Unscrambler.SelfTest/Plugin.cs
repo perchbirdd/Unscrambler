@@ -14,19 +14,22 @@ public sealed unsafe class Plugin : IDalamudPlugin
 {
     [PluginService] internal static IDalamudPluginInterface PluginInterface { get; private set; } = null!;
     [PluginService] internal static ICommandManager CommandManager { get; private set; } = null!;
-    [PluginService] internal static IClientState ClientState { get; private set; } = null!;
-    [PluginService] internal static INotificationManager NotificationManager { get; private set; } = null!;
-    [PluginService] internal static IChatGui ChatGui { get; private set; } = null!;
     [PluginService] internal static IGameInteropProvider Hooks { get; private set; } = null!;
-    [PluginService] internal static IDataManager DataManager { get; private set; } = null!;
     [PluginService] internal static IPluginLog Log { get; private set; } = null!;
-
+    [PluginService] internal static IFramework DalamudFramework { get; private set; } = null!;
+    [PluginService] internal static IObjectTable ObjectTable { get; private set; } = null!;
+    [PluginService] internal static IClientState ClientState { get; private set; } = null!;
+    // [PluginService] internal static INotificationManager NotificationManager { get; private set; } = null!;
+    // [PluginService] internal static IChatGui ChatGui { get; private set; } = null!;
+    // [PluginService] internal static IDataManager DataManager { get; private set; } = null!;
+    
     public static string GameVersion { get; private set; }
     public static VersionConstants Constants { get; private set; }
 
     private const string CommandName = "/ust";
 
     private readonly PluginState _state;
+    private readonly HateTracker _hateTracker;
     private readonly CaptureHookManager _captureHookManager;
 
     private readonly WindowSystem _windowSystem;
@@ -48,6 +51,8 @@ public sealed unsafe class Plugin : IDalamudPlugin
 
         var testDataDir = Path.Combine(PluginInterface.GetPluginConfigDirectory(), GameVersion);
         var testDataManager = new TestDataManager(testDataDir, Constants);
+
+        _hateTracker = new HateTracker(DalamudFramework, ObjectTable, ClientState, _state);
         
         var multiSigScanner = new MultiSigScanner(Log);
         _captureHookManager = new CaptureHookManager(Log, multiSigScanner, _state, Hooks, testDataManager);
@@ -67,6 +72,7 @@ public sealed unsafe class Plugin : IDalamudPlugin
 
     public void Dispose()
     {
+        _hateTracker.Dispose();
         _captureHookManager.Dispose();
         _windowSystem.RemoveAllWindows();
 

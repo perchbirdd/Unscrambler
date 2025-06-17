@@ -57,6 +57,7 @@ public class MainWindow : Window, IDisposable
             _state.OpcodeSuccesses.Clear();
             _state.OpcodeFailures.Clear();
         }
+        ImGui.TextUnformatted($"haters: {_state.TargetingHaters}");
         ImGui.Separator();
         
         using (var tb = ImRaii.Table("Opcodes", 3))
