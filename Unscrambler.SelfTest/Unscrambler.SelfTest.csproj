@@ -42,5 +42,6 @@
 
   <ItemGroup>
     <Content Include="LICENSE" />
+    <Content Include="Unscrambler.SelfTest.json" />
   </ItemGroup>
 </Project>
