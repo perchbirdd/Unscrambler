@@ -19,9 +19,6 @@ public sealed unsafe class Plugin : IDalamudPlugin
     [PluginService] internal static IFramework DalamudFramework { get; private set; } = null!;
     [PluginService] internal static IObjectTable ObjectTable { get; private set; } = null!;
     [PluginService] internal static IClientState ClientState { get; private set; } = null!;
-    // [PluginService] internal static INotificationManager NotificationManager { get; private set; } = null!;
-    // [PluginService] internal static IChatGui ChatGui { get; private set; } = null!;
-    // [PluginService] internal static IDataManager DataManager { get; private set; } = null!;
     
     public static string GameVersion { get; private set; }
     public static VersionConstants Constants { get; private set; }
@@ -30,6 +27,7 @@ public sealed unsafe class Plugin : IDalamudPlugin
 
     private readonly PluginState _state;
     private readonly HateTracker _hateTracker;
+    private readonly DeriveTester _deriveTester;
     private readonly CaptureHookManager _captureHookManager;
 
     private readonly WindowSystem _windowSystem;
@@ -56,8 +54,9 @@ public sealed unsafe class Plugin : IDalamudPlugin
         
         var multiSigScanner = new MultiSigScanner(Log);
         _captureHookManager = new CaptureHookManager(Log, multiSigScanner, _state, Hooks, testDataManager);
-        
-        _mainWindow = new MainWindow(_state);
+
+        _deriveTester = new DeriveTester(multiSigScanner, Log);
+        _mainWindow = new MainWindow(_state, _deriveTester);
         _windowSystem =  new WindowSystem("Unscrambler.SelfTest");
         _windowSystem.AddWindow(_mainWindow);
 

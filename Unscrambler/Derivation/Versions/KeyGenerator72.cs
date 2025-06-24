@@ -75,6 +75,7 @@ public class KeyGenerator72 : IKeyGenerator
     /// </summary>
     /// <param name="initZonePacket">The initzone packet, starting from after the packet header, sometimes called
     /// the segment header.</param>
+    [Obsolete("Please use GenerateInitZone.")]
     public void Generate(Span<byte> initZonePacket)
     {
         var mode = initZonePacket[37];
@@ -96,12 +97,64 @@ public class KeyGenerator72 : IKeyGenerator
         var negSeed2 = (byte)~seed2;
         var negSeed3 = (uint)~seed3;
 
-        Derive(0, negSeed1, negSeed2, negSeed3);
-        Derive(1, negSeed1, negSeed2, negSeed3);
-        Derive(2, negSeed1, negSeed2, negSeed3);
+        Keys[0] = Derive(0, negSeed1, negSeed2, negSeed3);
+        Keys[1] = Derive(1, negSeed1, negSeed2, negSeed3);
+        Keys[2] = Derive(2, negSeed1, negSeed2, negSeed3);
+    }
+    
+    public void GenerateFromInitZone(Span<byte> initZonePacket)
+    {
+        var mode = initZonePacket[37];
+        if (mode != _constants.ObfuscationEnabledMode)
+        {
+            Keys[0] = 0;
+            Keys[1] = 0;
+            Keys[2] = 0;
+            ObfuscationEnabled = false;
+            return;
+        }
+        ObfuscationEnabled = true;
+
+        var seed1 = initZonePacket[38];
+        var seed2 = initZonePacket[39];
+        var seed3 = BitConverter.ToUInt32(initZonePacket[40..45]);
+
+        var negSeed1 = (byte)~seed1;
+        var negSeed2 = (byte)~seed2;
+        var negSeed3 = (uint)~seed3;
+
+        Keys[0] = Derive(0, negSeed1, negSeed2, negSeed3);
+        Keys[1] = Derive(1, negSeed1, negSeed2, negSeed3);
+        Keys[2] = Derive(2, negSeed1, negSeed2, negSeed3);
+    }
+    
+    public void GenerateFromUnknownInitializer(Span<byte> unknownPacket)
+    {
+        var mode = unknownPacket[22];
+        if (mode != _constants.ObfuscationEnabledMode)
+        {
+            Keys[0] = 0;
+            Keys[1] = 0;
+            Keys[2] = 0;
+            ObfuscationEnabled = false;
+            return;
+        }
+        ObfuscationEnabled = true;
+
+        var seed1 = unknownPacket[23];
+        var seed2 = unknownPacket[24];
+        var seed3 = BitConverter.ToUInt32(unknownPacket[28..33]);
+
+        var negSeed1 = (byte)~seed1;
+        var negSeed2 = (byte)~seed2;
+        var negSeed3 = (uint)~seed3;
+
+        Keys[0] = Derive(0, negSeed1, negSeed2, negSeed3);
+        Keys[1] = Derive(1, negSeed1, negSeed2, negSeed3);
+        Keys[2] = Derive(2, negSeed1, negSeed2, negSeed3);
     }
 
-    private void Derive(byte set, byte nSeed1, byte nSeed2, uint epoch)
+    private byte Derive(byte set, byte nSeed1, byte nSeed2, uint epoch)
     {
         var midIndex = 8 * (nSeed1 % (_midTable.Length / 8));
         var midTableValue = _midTable[4 + midIndex];
@@ -122,6 +175,6 @@ public class KeyGenerator72 : IKeyGenerator
             _ => 0,
         };
         
-        Keys[set] = (byte)(nSeed1 + midTableValue + dayTableValue + setResult);
+        return (byte)(nSeed1 + midTableValue + dayTableValue + setResult);
     }
 }

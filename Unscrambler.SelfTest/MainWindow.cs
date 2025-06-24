@@ -11,8 +11,9 @@ namespace Unscrambler.SelfTest;
 public class MainWindow : Window, IDisposable
 {
     private readonly PluginState _state;
+    private readonly DeriveTester _deriveTester;
     
-    public MainWindow(PluginState state)
+    public MainWindow(PluginState state, DeriveTester deriveTester)
         : base("Unscrambler Self Test", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse)
     {
         SizeConstraints = new WindowSizeConstraints
@@ -23,6 +24,7 @@ public class MainWindow : Window, IDisposable
         IsOpen = true;
 
         _state = state;
+        _deriveTester = deriveTester;
     }
 
     public void Dispose()
@@ -56,6 +58,11 @@ public class MainWindow : Window, IDisposable
         {
             _state.OpcodeSuccesses.Clear();
             _state.OpcodeFailures.Clear();
+        }
+
+        if (ImGui.Button("Derive test"))
+        {
+            _deriveTester.Run();
         }
         ImGui.TextUnformatted($"haters: {_state.TargetingHaters}");
         ImGui.Separator();
