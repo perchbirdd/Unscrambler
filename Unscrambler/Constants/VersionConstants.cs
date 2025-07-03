@@ -20,6 +20,7 @@ public class VersionConstants
     public int DayTableSize { get; init; }
 
     public int InitZoneOpcode { get; init; }
+    public int UnknownObfuscationInitOpcode { get; init; }
 
     public Dictionary<string, int> ObfuscatedOpcodes { get; init; } = [];
     public static Dictionary<string, VersionConstants> Constants { get; } = [];
@@ -38,6 +39,8 @@ public class VersionConstants
         Constants.Add(_725h1.GameVersion, _725h1);
         var _725h2 = GameConstants.For725h2();
         Constants.Add(_725h2.GameVersion, _725h2);
+        var _725h3 = GameConstants.For725h3();
+        Constants.Add(_725h3.GameVersion, _725h3);
     }
 
     public static VersionConstants ForGameVersion(string gameVersion)

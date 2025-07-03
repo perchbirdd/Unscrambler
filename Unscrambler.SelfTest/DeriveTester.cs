@@ -22,7 +22,7 @@ public class DeriveTester
         _log = log;
         _generator = KeyGeneratorFactory.ForGameVersion(Plugin.GameVersion);
 
-        var derivePtr = scanner.ScanText("48 89 74 24 ?? 57 41 0F B6 F8");
+        var derivePtr = scanner.ScanText("48 89 74 24 ?? 57 41 0F B6 F0");
         // _deriveHook = _hooks.HookFromAddress<DerivePrototype>(derivePtr, DeriveDetour);
         _deriveFunc = Marshal.GetDelegateForFunctionPointer<DerivePrototype>(derivePtr);
     }

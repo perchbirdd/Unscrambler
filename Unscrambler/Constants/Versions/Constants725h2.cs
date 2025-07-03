@@ -17,6 +17,7 @@ public partial class GameConstants
             DayTableSize = 48 * 4,
             ObfuscationEnabledMode = 41,
             InitZoneOpcode = 0x37E,
+            UnknownObfuscationInitOpcode = 0x212,
             ObfuscatedOpcodes = new Dictionary<string, int>
             {
                 { "PlayerSpawn", 0x32A },
