@@ -41,10 +41,11 @@ public class MainWindow : Window, IDisposable
         ImGui.TextUnformatted($"game random: {dispatcher->GameRandom}");
         ImGui.TextUnformatted($"last packet random: {dispatcher->LastPacketRandom}");
         
+        // Calculate the actual key values from the randomness
         var sub = _state.Dispatcher->GameRandom + _state.Dispatcher->LastPacketRandom;
-        ImGui.TextUnformatted($"key0: {dispatcher->Key0} ({dispatcher->Key0 - sub})");
-        ImGui.TextUnformatted($"key1: {dispatcher->Key1} ({dispatcher->Key1 - sub})");
-        ImGui.TextUnformatted($"key2: {dispatcher->Key2} ({dispatcher->Key2 - sub})");
+        ImGui.TextUnformatted($"key0: {dispatcher->Key0} (Actual: {dispatcher->Key0 - sub})");
+        ImGui.TextUnformatted($"key1: {dispatcher->Key1} (Actual: {dispatcher->Key1 - sub})");
+        ImGui.TextUnformatted($"key2: {dispatcher->Key2} (Actual: {dispatcher->Key2 - sub})");
         
         ImGui.TextUnformatted($"unk: {dispatcher->Unknown_32}");
         
