@@ -66,12 +66,12 @@ public class MainWindow : Window, IDisposable
             _state.OpcodeSuccesses.Clear();
             _state.OpcodeFailures.Clear();
         }
-
-        if (ImGui.Button("Derive test"))
+        ImGui.SameLine();
+        if (ImGui.Button("Derive Test"))
         {
             _deriveTester.Run();
         }
-        ImGui.TextUnformatted($"haters: {_state.TargetingHaters}");
+        ImGui.TextUnformatted($"# of Haters: {_state.TargetingHaters}");
         ImGui.Separator();
         
         using (var tb = ImRaii.Table("Opcodes", 3))
