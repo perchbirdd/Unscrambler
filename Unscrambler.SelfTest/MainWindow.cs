@@ -35,16 +35,21 @@ public class MainWindow : Window, IDisposable
     {
         var dispatcher = _state.Dispatcher;
         
+        ImGui.TextDisabled("Game Packet Dispatcher");
+        ImGui.Separator();
+
         ImGui.TextUnformatted($"game random: {dispatcher->GameRandom}");
         ImGui.TextUnformatted($"last packet random: {dispatcher->LastPacketRandom}");
         
+        // Calculate the actual key values from the randomness
         var sub = _state.Dispatcher->GameRandom + _state.Dispatcher->LastPacketRandom;
-        ImGui.TextUnformatted($"key0: {dispatcher->Key0} ({dispatcher->Key0 - sub})");
-        ImGui.TextUnformatted($"key1: {dispatcher->Key1} ({dispatcher->Key1 - sub})");
-        ImGui.TextUnformatted($"key2: {dispatcher->Key2} ({dispatcher->Key2 - sub})");
+        ImGui.TextUnformatted($"key0: {dispatcher->Key0} (Actual: {dispatcher->Key0 - sub})");
+        ImGui.TextUnformatted($"key1: {dispatcher->Key1} (Actual: {dispatcher->Key1 - sub})");
+        ImGui.TextUnformatted($"key2: {dispatcher->Key2} (Actual: {dispatcher->Key2 - sub})");
         
         ImGui.TextUnformatted($"unk: {dispatcher->Unknown_32}");
         
+        ImGui.TextDisabled("Unscrambler");
         ImGui.Separator();
         ImGui.TextUnformatted("state keys:");
         ImGui.TextUnformatted($"are keys from dispatcher? {_state.KeysFromDispatcher}");
@@ -53,18 +58,20 @@ public class MainWindow : Window, IDisposable
         ImGui.TextUnformatted($"key0: {_state.GeneratedKey1}");
         ImGui.TextUnformatted($"key1: {_state.GeneratedKey2}");
         ImGui.TextUnformatted($"key2: {_state.GeneratedKey3}");
+
+        ImGui.TextDisabled("Tester");
         ImGui.Separator();
         if (ImGui.Button("Clear"))
         {
             _state.OpcodeSuccesses.Clear();
             _state.OpcodeFailures.Clear();
         }
-
-        if (ImGui.Button("Derive test"))
+        ImGui.SameLine();
+        if (ImGui.Button("Derive Test"))
         {
             _deriveTester.Run();
         }
-        ImGui.TextUnformatted($"haters: {_state.TargetingHaters}");
+        ImGui.TextUnformatted($"# of Haters: {_state.TargetingHaters}");
         ImGui.Separator();
         
         using (var tb = ImRaii.Table("Opcodes", 3))
