@@ -9,7 +9,8 @@ A library for deobfuscating packets for Final Fantasy XIV.
 
 - [Obfuscation Updates](#obfuscation-updates)
 
-  - [7.3 Changes]
+  - [7.3 Changes](#73-changes)
+  - [7.3 API Updates](#73-api-updates)
 
 - [Using the library](#using-the-library)
 
@@ -22,6 +23,8 @@ A library for deobfuscating packets for Final Fantasy XIV.
 - [Self Test](#self-test)
 
 - [Important Notices](#important-notices)
+  - [ActorControl](#actorcontrol)
+  - [ActorCast](#actorcast)
 
 # What is this?
 In 7.2 (2025.03.18.0000.0000), released 3/25/2025, Square Enix implemented obfuscation for specific packets used in the
