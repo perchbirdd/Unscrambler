@@ -1,6 +1,6 @@
 ﻿namespace Unscrambler.Constants.Versions;
 
-public partial class GameConstants
+public static partial class GameConstants
 {
     public static VersionConstants For725h3()
     {
@@ -37,6 +37,7 @@ public partial class GameConstants
                 { "UpdateGearset", 0x34B },
                 { "UpdateParty", 0x182 },
                 { "ActorControl", 0x3E7 },
+                { "ActorCast", 0x113 },
 
                 { "UnknownEffect01", 0x2E7 },
                 { "UnknownEffect16", 0x22A },

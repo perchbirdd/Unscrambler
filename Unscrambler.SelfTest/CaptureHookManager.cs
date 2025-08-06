@@ -24,7 +24,7 @@ public unsafe class CaptureHookManager : IDisposable
 	private delegate byte OtherCreateTargetCallerPrototype(void* a1, void* a2, void* a3);
 	private readonly Hook<OtherCreateTargetCallerPrototype> _otherCreateTargetCallerHook;
 
-	[Function([FunctionAttribute.Register.rcx, FunctionAttribute.Register.rsi], FunctionAttribute.Register.rax, false)]
+	[Function([FunctionAttribute.Register.rcx, FunctionAttribute.Register.rdi], FunctionAttribute.Register.rax, false)]
 	private delegate byte CreateTargetPrototype(int entityId, nint packetPtr);
 	private readonly Hook<CreateTargetPrototype> _createTargetHook;
 
@@ -116,9 +116,7 @@ public unsafe class CaptureHookManager : IDisposable
 		_createTargetHook?.Dispose();
 		_otherCreateTargetCallerHook?.Dispose();
 	}
-
-	// I know this is very silly, but I don't have access to the return address like Deucalion so uhh
-	// let me know if you know of a way I can get the return address in CreateTargetDetour and I'll fix it!
+	
 	private byte OtherCreateTargetCallerDetour(void* a1, void* a2, void* a3)
 	{
 		_ignoreCreateTarget = true;
@@ -143,12 +141,12 @@ public unsafe class CaptureHookManager : IDisposable
 			}
 
 			QueuedPacket? queuedPacket = null;
-			var opcode = *(ushort*)(packetPtr + 2);
+			var opcode = OpcodeUtility.GetOpcodeFromPacketAtIpcStart(new Span<byte>((void*)packetPtr, 4));
 			
 			if (opcode == Plugin.Constants.InitZoneOpcode)
 			{
 				_log.Verbose($"[CreateTarget]: {opcode:X} InitZone :)");
-				return _createTargetHook.Original(entityId, packetPtr);;
+				return _createTargetHook.Original(entityId, packetPtr);
 			}
 			
 			if (!_state.OpcodesNeeded.Contains(opcode))
@@ -175,9 +173,7 @@ public unsafe class CaptureHookManager : IDisposable
 			var data = new Span<byte>((byte*)packetPtr, queuedPacket.DataSize);
 			queuedPacket.GameData = data.ToArray();
 			queuedPacket.GameDataHash = HashPacket(queuedPacket.GameData);
-			// _unscrambler.Unscramble(queuedPacket.UnscramblerData, _keyGenerator.Keys[0], _keyGenerator.Keys[1], _keyGenerator.Keys[2]);
-			// queuedPacket.UnscramblerDataHash = HashPacket(queuedPacket.UnscramblerData);
-
+			
 			if (queuedPacket.GameDataHash == queuedPacket.UnscramblerDataHash)
 			{
 				_state.MarkOpcode(queuedPacket.Opcode, true);
@@ -292,8 +288,8 @@ public unsafe class CaptureHookManager : IDisposable
 	            DataSize = pktData.Length,
 	            Header = pktHdrSlice.ToArray()
             };
-            
-            var opcode = BitConverter.ToUInt16(pktData[2..4]);
+
+            var opcode = OpcodeUtility.GetOpcodeFromPacketAtIpcStart(pktData);
             queuedPacket.Opcode = opcode;
 
             if (opcode == Plugin.Constants.InitZoneOpcode)
@@ -329,8 +325,13 @@ public unsafe class CaptureHookManager : IDisposable
 	            if (_keyGenerator.ObfuscationEnabled || _obfuscationOverride)
 	            {
 		            _log.Verbose($"unscrambling {opcode:X}");
-		            _unscrambler.Unscramble(queuedPacket.UnscramblerData, _keyGenerator.Keys[0], _keyGenerator.Keys[1],
-			            _keyGenerator.Keys[2]);
+		            _state.OpcodeBasedKey = _keyGenerator.GetOpcodeBasedKey(opcode);
+		            _unscrambler.Unscramble(
+			            queuedPacket.UnscramblerData, 
+			            _keyGenerator.Keys[0],
+			            _keyGenerator.Keys[1],
+			            _keyGenerator.Keys[2],
+			            _state.OpcodeBasedKey);
 	            }
 	            queuedPacket.UnscramblerDataHash = HashPacket(queuedPacket.UnscramblerData);
 	            
@@ -347,7 +348,7 @@ public unsafe class CaptureHookManager : IDisposable
 
     private string DispatcherDebugSuffix()
     {
-	    return $"| {_state.ObfuscationEnabled} {_state.GeneratedKey1} {_state.GeneratedKey2} {_state.GeneratedKey3}";
+	    return $"| {_state.ObfuscationEnabled} {_state.GeneratedKey1} {_state.GeneratedKey2} {_state.GeneratedKey3} | {_state.OpcodeBasedKey}";
     }
 
     private string HashPacket(Span<byte> data)

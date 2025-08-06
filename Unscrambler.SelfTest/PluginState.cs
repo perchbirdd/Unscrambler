@@ -12,6 +12,7 @@ public unsafe class PluginState
     public byte GeneratedKey1 { get; set; }
     public byte GeneratedKey2 { get; set; }
     public byte GeneratedKey3 { get; set; }
+    public int OpcodeBasedKey { get; set; }
     
     public HashSet<int> OpcodesNeeded { get; set; }
     

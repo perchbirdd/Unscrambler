@@ -3,10 +3,9 @@ using Unscrambler.Constants;
 
 namespace Unscrambler.Derivation.Versions;
 
-public class KeyGenerator72 : IKeyGenerator
+public class KeyGenerator73 : IKeyGenerator
 {
     public bool ObfuscationEnabled { get; set; }
-    
     public byte[] Keys { get; set; }
  
     private VersionConstants _constants;
@@ -15,6 +14,7 @@ public class KeyGenerator72 : IKeyGenerator
     private int[] _table2 = [];
     private byte[] _midTable = [];
     private byte[] _dayTable = [];
+    private int[] _opcodeKeyTable = [];
 
     public void Initialize(VersionConstants constants, string? tableBinaryBasePath = null)
     {
@@ -38,6 +38,7 @@ public class KeyGenerator72 : IKeyGenerator
         byte[] tTable0;
         byte[] tTable1;
         byte[] tTable2;
+        byte[] tOpcodeKeyTable;
         
         if (basePath == null)
         {
@@ -46,6 +47,7 @@ public class KeyGenerator72 : IKeyGenerator
             tTable2 = GetResource($"{_constants.GameVersion}.table2.bin");
             _midTable = GetResource($"{_constants.GameVersion}.midtable.bin");
             _dayTable = GetResource($"{_constants.GameVersion}.daytable.bin");
+            tOpcodeKeyTable = GetResource($"{_constants.GameVersion}.opcodekeytable.bin");
         }
         else
         {
@@ -54,11 +56,13 @@ public class KeyGenerator72 : IKeyGenerator
             tTable2 = File.ReadAllBytes(Path.Combine(basePath, "table2.bin"));
             _midTable = File.ReadAllBytes(Path.Combine(basePath, "midtable.bin"));
             _dayTable = File.ReadAllBytes(Path.Combine(basePath, "daytable.bin"));
+            tOpcodeKeyTable = File.ReadAllBytes(Path.Combine(basePath, "opcodekeytable.bin"));
         }
 
         _table0 = new int[tTable0.Length / 4];
         _table1 = new int[tTable1.Length / 4];
         _table2 = new int[tTable2.Length / 4];
+        _opcodeKeyTable = new int[tOpcodeKeyTable.Length / 4];
         
         for (int i = 0; i < tTable0.Length; i += 4)
             _table0[i / 4] = BitConverter.ToInt32(tTable0, i);
@@ -68,7 +72,9 @@ public class KeyGenerator72 : IKeyGenerator
             
         for (int i = 0; i < tTable2.Length; i += 4)
             _table2[i / 4] = BitConverter.ToInt32(tTable2, i);
-        
+
+        for (int i = 0; i < tOpcodeKeyTable.Length; i += 4)
+            _opcodeKeyTable[i / 4] = BitConverter.ToInt32(tOpcodeKeyTable, i);
     }
     
     public void GenerateFromInitZone(Span<byte> initZonePacket)
@@ -149,6 +155,8 @@ public class KeyGenerator72 : IKeyGenerator
     
     public int GetOpcodeBasedKey(int opcode)
     {
-        throw new NotImplementedException("The opcode-based key cannot be generated on 7.2 KeyGenerator implementations.");
+        var baseKey = Keys[opcode % 3];
+        var opcodeKeyTableIndex = (opcode + baseKey) % _opcodeKeyTable.Length;
+        return _opcodeKeyTable[opcodeKeyTableIndex];
     }
 }

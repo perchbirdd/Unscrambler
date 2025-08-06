@@ -3,7 +3,7 @@ using Unscrambler.Constants;
 
 namespace Unscrambler.Unscramble.Versions;
 
-public unsafe class Unscrambler72 : IUnscrambler
+public unsafe class Unscrambler73 : IUnscrambler
 {
     private VersionConstants _constants;
 
@@ -11,17 +11,23 @@ public unsafe class Unscrambler72 : IUnscrambler
     {
         _constants = constants;
     }
-
+    
     public void Unscramble(Span<byte> input, byte key0, byte key1, byte key2)
     {
+        // 7.3 requires the opcode-based key
+        throw new NotImplementedException("The opcode-based key is required for 7.3 Unscrambler implementations.");
+    }
+
+    public void Unscramble(Span<byte> input, byte key0, byte key1, byte key2, int opcodeBasedKey)
+    {
         // Ditch - something is uninitialized, and there's no way to know if it's on purpose or not
-        if (key0 == 0 && key1 == 0 && key2 == 0) return;
+        if (key0 == 0 && key1 == 0 && key2 == 0 && opcodeBasedKey == 0) return;
         
         Span<uint> keys = stackalloc uint[3];
         keys[0] = key0;
         keys[1] = key1;
         keys[2] = key2;
-
+        
         var opcode = OpcodeUtility.GetOpcodeFromPacketAtIpcStart(input);
         
         var baseKey = (byte) keys[opcode % 3];
@@ -45,7 +51,7 @@ public unsafe class Unscrambler72 : IUnscrambler
                 
                 // Equipment
                 const int equipOffset = 556;
-                var intKeyToUse = baseKey + 118426275;
+                var intKeyToUse = baseKey + opcodeBasedKey;
                 for (int i = 0; i < 10; i++)
                 {
                     var offset = equipOffset + i * 4;
@@ -56,39 +62,39 @@ public unsafe class Unscrambler72 : IUnscrambler
             // NpcSpawn
             case true when opcode == _constants.ObfuscatedOpcodes["NpcSpawn"]:
             {
-                UnscrambleNpcSpawn(data, baseKey, 0xF1E2D9C8);
+                UnscrambleNpcSpawn(data, baseKey, (uint) opcodeBasedKey);
                 break;
             }
             // NpcSpawn2
             case true when opcode == _constants.ObfuscatedOpcodes["NpcSpawn2"]:
             {
-                UnscrambleNpcSpawn(data, baseKey, 0x36535234);
+                UnscrambleNpcSpawn(data, baseKey, (uint) opcodeBasedKey);
                 break;
             }
             // ActionEffect
             case true when opcode == _constants.ObfuscatedOpcodes["ActionEffect01"]:
             {
-                UnscrambleActionEffect(data, 1, baseKey, 20497);
+                UnscrambleActionEffect(data, 1, baseKey, opcodeBasedKey);
                 break;
             }
             case true when opcode == _constants.ObfuscatedOpcodes["ActionEffect08"]:
             {
-                UnscrambleActionEffect(data, 8, baseKey, -16607);
+                UnscrambleActionEffect(data, 8, baseKey, opcodeBasedKey);
                 break;
             }
             case true when opcode == _constants.ObfuscatedOpcodes["ActionEffect16"]:
             {
-                UnscrambleActionEffect(data, 16, baseKey, 1137);
+                UnscrambleActionEffect(data, 16, baseKey, opcodeBasedKey);
                 break;
             }
             case true when opcode == _constants.ObfuscatedOpcodes["ActionEffect24"]:
             {
-                UnscrambleActionEffect(data, 24, baseKey, 12187);
+                UnscrambleActionEffect(data, 24, baseKey, opcodeBasedKey);
                 break;
             }
             case true when opcode == _constants.ObfuscatedOpcodes["ActionEffect32"]:
             {
-                UnscrambleActionEffect(data, 32, baseKey, 10780);
+                UnscrambleActionEffect(data, 32, baseKey, opcodeBasedKey);
                 break;
             }
             // StatusEffectList
@@ -128,7 +134,7 @@ public unsafe class Unscrambler72 : IUnscrambler
             case true when opcode == _constants.ObfuscatedOpcodes["UpdateGearset"]:
             {
                 const int opOffset = 36;
-                var intKeyToUse = baseKey - 863169860;
+                var intKeyToUse = baseKey + opcodeBasedKey;
                 for (int i = 0; i < 10; i++)
                 {
                     var offset = opOffset + i * 4;
@@ -172,13 +178,13 @@ public unsafe class Unscrambler72 : IUnscrambler
             // - ActionEffect2?
             case true when opcode == _constants.ObfuscatedOpcodes["ActionEffect02"]:
             {
-                UnscrambleActionEffect(data, 2, baseKey, -26175);
+                UnscrambleActionEffect(data, 2, baseKey, opcodeBasedKey);
                 break;
             }
             // - ActionEffect4?
             case true when opcode == _constants.ObfuscatedOpcodes["ActionEffect04"]:
             {
-                UnscrambleActionEffect(data, 4, baseKey, 22105);
+                UnscrambleActionEffect(data, 4, baseKey, opcodeBasedKey);
                 break;
             }
             // Actually unknown
@@ -187,7 +193,7 @@ public unsafe class Unscrambler72 : IUnscrambler
                 *(uint *)(data + 28) -= baseKey;
                 
                 var opOffset = 66;
-                var shortKey = (short) (baseKey + 1255);
+                var shortKey = (short) (baseKey + opcodeBasedKey);
                 var targetCount = 1;
                 for (int i = 0; i < 8 * targetCount; i++)
                 {
@@ -202,7 +208,7 @@ public unsafe class Unscrambler72 : IUnscrambler
                 *(uint *)(data + 28) -= baseKey;
                 
                 var opOffset = 58;
-                var shortKey = (short) (baseKey + 32129);
+                var shortKey = (short) (baseKey + opcodeBasedKey);
                 var targetCount = 16;
                 for (int i = 0; i < 8 * targetCount; i++)
                 {
@@ -212,12 +218,6 @@ public unsafe class Unscrambler72 : IUnscrambler
                 break;
             }
         }
-    }
-
-    public void Unscramble(Span<byte> input, byte key0, byte key1, byte key2, int opcodeBasedKey)
-    {
-        // 7.2 does not use the opcode-based key
-        Unscramble(input, key0, key1, key2);
     }
 
     private void UnscrambleStatusEffectList(byte* data, byte baseKey, int opOffset)
