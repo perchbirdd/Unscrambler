@@ -418,16 +418,16 @@ It seems Square has caught on to the fact that their per-packet constants made i
 patch, as the most time-consuming aspect is updating opcodes. Rather than making it constant, they decided to base it
 on the other key, making this value now dependent on the server.
 
-This is the only major change to the obfuscation in 7.3
+This is the only major change to the obfuscation in 7.3.
 
 ### 7.3 API Updates
 
-- IUnscrambler has a new signature for `Unscramble` that accepts an opcodeBasedKey. This method is required for 
-  unscrambling on 7.3, and ignores this parameter when used on any earlier game version. Using the `Unscramble`
-  signature that does not have this parameter on versions 7.3 and later will result in an exception.
 - IKeyGenerator has a new method `GetOpcodeBasedKey` that accepts an opcode and will provide the appropriate
   `opcodeBasedKey` to pass to an IUnscrambler implementation for 7.3 unscrambling. This method throws an exception on
   `IKeyGenerator` implementations earlier than 7.3.
+- IUnscrambler has a new signature for `Unscramble` that accepts an opcodeBasedKey. This method is required for 
+  unscrambling on 7.3, and ignores this parameter when used on any earlier game version. Using the `Unscramble`
+  signature that does not have this parameter on versions 7.3 and later will result in an exception.
 - There is now an `OpcodeUtility` class that provides methods for working with opcodes. At the moment, it contains two
   methods, both of which return the opcode of a packet. `GetOpcodeFromPacketAtPacketStart` expects the provided
   Span to start at the packet header. `GetOpcodeFromPacketAtIpcStart` expects the Span to start at the IPC header.
@@ -443,7 +443,7 @@ var keyGenerator = KeyGeneratorFactory.ForGameVersion("2025.03.27.0000.0000");
 and you feed it InitZone packets like so:
 ```csharp
 if (packet.Opcode == VersionConstants.ForGameVersion("2025.03.27.0000.0000").InitZoneOpcode) {
-    keyGenerator.Generate(initZone);
+    keyGenerator.GenerateFromInitZone(packet.Data);
     /*
     keyGenerator.DeobfuscationEnabled,
     keyGenerator.Keys[0],
@@ -451,6 +451,13 @@ if (packet.Opcode == VersionConstants.ForGameVersion("2025.03.27.0000.0000").Ini
     keyGenerator.Keys[2]
     are all now set and ready to be used.
     */
+}   
+```
+Note that you should also take care to provide UnknownInitializer packets, just in case. These have never
+been seen in the wild, thus the name, but it doesn't hurt:
+```csharp
+if (packet.Opcode == VersionConstants.ForGameVersion("2025.03.27.0000.0000").UnknownObfuscationInitOpcode) {
+    keyGenerator.GenerateFromUnknownInitializer(packet.Data);
 }   
 ```
 
@@ -462,8 +469,10 @@ This is because the library will provide a dedicated implementation of IUnscramb
 
 You deobfuscate packets like so:
 ```csharp
-var packetData = GetPacketData(); 
-unscrambler.Unscramble(packetData, keyGenerator.Keys[0], keyGenerator.Keys[1], keyGenerator.Keys[2]);
+var packetData = GetPacketDataAtIpcHeader();
+var opcode = OpcodeUtility.GetOpcodeFromPacketAtIpcStart(packetData);
+var opcodeBasedKey = keyGenerator.GetOpcodeBasedKey(opcode);
+unscrambler.Unscramble(packetData, keyGenerator.Keys[0], keyGenerator.Keys[1], keyGenerator.Keys[2], opcodeBasedKey);
 ```
 The unscrambler will deobfuscate the packet in-place. Note that the provided data must start at the IPC header. Not 
 after the IPC header, but at the IPC header, as the function will obtain the opcode by accessing `data[2]`.
