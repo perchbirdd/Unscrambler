@@ -7,6 +7,10 @@ A library for deobfuscating packets for Final Fantasy XIV.
   
   - [The Workaround, and "Why not hooking?"](#the-workaround-and-why-not-hooking)
 
+- [Obfuscation Updates](#obfuscation-updates)
+
+  - [7.3 Changes]
+
 - [Using the library](#using-the-library)
 
   - [Extra considerations](#extra-considerations)
@@ -345,6 +349,86 @@ and receive a type 2 packet (IPC is type 3), the game will send you both in the 
 CreateTarget on this IPC packet. If the game sends you this packet outside of a frame with a type 2 packet, it will 
 call CreateTarget on it. I was tired of the constant workarounds to ensure the integrity of my data.
 
+# Obfuscation Updates
+
+## 7.3 Changes
+
+Patch 7.3 brought one major change to the obfuscation. Previously, almost every packet had its own hardcoded constant 
+applied to certain fields. This was in addition to the single obfuscation key derived from data sent by the server. 
+
+For example, consider `UpdateGearSet` in 7.25 hotfix 3:
+```C
+MemCpy(tmpPacket, packet, 0x10A0u);
+iter = 0;
+obfStart = &tmpPacket[44];
+compoundKey = baseKey - 863169860;
+packet = tmpPacket;
+do
+{
+    *(obfStart - 2) ^= compoundKey;
+    iter += 10;
+    *(obfStart - 1) ^= compoundKey;
+    *obfStart ^= compoundKey;
+    obfStart[1] ^= compoundKey;
+    obfStart[2] ^= compoundKey;
+    obfStart[3] ^= compoundKey;
+    obfStart[4] ^= compoundKey;
+    obfStart[5] ^= compoundKey;
+    obfStart[6] ^= compoundKey;
+    obfStart[7] ^= compoundKey;
+    obfStart += 10;
+}
+while ( iter < 0xA );
+```
+
+versus `UpdateGearSet` in 7.3:
+```C
+baseKey = this.keys[opcode % 3] - lastPacketRand - gameRand;
+opcodeBasedKey = opcodeKeyTable[(baseKey + opcode) % 85];
+
+// ...
+
+case 0x2ACu:
+    memmove(tmpPacket, (const void *)packet, 0x1B68u);
+    iter = 0;
+    compoundKey = opcodeBasedKey + baseKey;
+    obfStart = &tmpPacket[44];
+    do
+    {
+        *(obfStart - 2) ^= compoundKey;
+        iter += 10;
+        *(obfStart - 1) ^= compoundKey;
+        *obfStart ^= compoundKey;
+        obfStart[1] ^= compoundKey;
+        obfStart[2] ^= compoundKey;
+        obfStart[3] ^= compoundKey;
+        obfStart[4] ^= compoundKey;
+        obfStart[5] ^= compoundKey;
+        obfStart[6] ^= compoundKey;
+        obfStart[7] ^= compoundKey;
+        obfStart += 10;
+    }
+    while ( v64 < 0xA );
+```
+
+It seems Square has caught on to the fact that their per-packet constants made it trivial to update this library every
+patch, as the most time-consuming aspect is updating opcodes. Rather than making it constant, they decided to base it
+on the other key, making this value now dependent on the server.
+
+This is the only major change to the obfuscation in 7.3
+
+### 7.3 API Updates
+
+- IUnscrambler has a new signature for `Unscramble` that accepts an opcodeBasedKey. This method is required for 
+  unscrambling on 7.3, and ignores this parameter when used on any earlier game version. Using the `Unscramble`
+  signature that does not have this parameter on versions 7.3 and later will result in an exception.
+- IKeyGenerator has a new method `GetOpcodeBasedKey` that accepts an opcode and will provide the appropriate
+  `opcodeBasedKey` to pass to an IUnscrambler implementation for 7.3 unscrambling. This method throws an exception on
+  `IKeyGenerator` implementations earlier than 7.3.
+- There is now an `OpcodeUtility` class that provides methods for working with opcodes. At the moment, it contains two
+  methods, both of which return the opcode of a packet. `GetOpcodeFromPacketAtPacketStart` expects the provided
+  Span to start at the packet header. `GetOpcodeFromPacketAtIpcStart` expects the Span to start at the IPC header.
+
 # Using the library
 
 The functionality is condensed into two classes, `KeyGenerator` and `Unscrambler`.
@@ -492,8 +576,18 @@ Important notices regarding data captured with this library will be posted here.
 From
 [its release on April 7th](https://github.com/perchbirdd/Unscrambler/commit/c1c4d0254f2b228e5a786b0b657576b8f1f79ea8) 
 until 
-[its update on May 27th](https://github.com/perchbirdd/Unscrambler/commit/7e947b314eedfade1d591d408407c48e8baabf9b), 
-this library did not handle ActorControl packets with the type
-`TargetIcon`, commonly known as headmarkers. Any actor control packets with the TargetIcon type must either be
+[its update on May 27th](https://github.com/perchbirdd/Unscrambler/commit/2010d17f23ca7436a762aaff06c18fc4a2ade862), 
+this library did not handle deobfuscating ActorControl packets with the type `TargetIcon`, commonly known as 
+headmarkers. Any actor control packets with the TargetIcon type persisted on disk for later use must either be
 deobfuscated after-the-fact by regenerating keys from InitZone packets, deriving the keys some other way, or entirely 
 ignored. I apologize for any inconvenience.
+
+### ActorCast
+
+From
+[its release on April 7th](https://github.com/perchbirdd/Unscrambler/commit/c1c4d0254f2b228e5a786b0b657576b8f1f79ea8)
+until
+[its update on August 5th](https://github.com/perchbirdd/Unscrambler/commit/c335cfb8b8c6bfabfe8273d8be703cfeaa6c602e),
+this library did not handle deobfuscating ActorCast packets. Any actor cast packets persisted on disk for later use
+must either be deobfuscated after-the-fact by regenerating keys from InitZone packets, deriving the keys some other 
+way, or entirely ignored. I apologize for any inconvenience.
