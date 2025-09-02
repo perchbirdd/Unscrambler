@@ -8,7 +8,7 @@
     </PropertyGroup>
     
     <PropertyGroup>
-        <PackageId>Unscrambler</PackageId>
+        <PackageId>Unscrambler.XIV</PackageId>
         <Version>1.0.0</Version>
         <Authors>perchbird</Authors>
         <Description>A library for reversing packet obfuscation in an online game.</Description>

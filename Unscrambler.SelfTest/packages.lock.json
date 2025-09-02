@@ -43,7 +43,7 @@
           "Microsoft.Windows.SDK.Win32Metadata": "60.0.34-preview"
         }
       },
-      "unscrambler": {
+      "Unscrambler.XIV": {
         "type": "Project"
       }
     }
