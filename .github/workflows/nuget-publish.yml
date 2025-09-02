@@ -18,7 +18,7 @@ jobs:
       - name: Restore dependencies
         run: dotnet restore
       - name: Build
-        run: dotnet build --no-restore --configuration Release -p:Version='${{ github.ref_name }}'
+        run: dotnet build --no-restore --configuration Release -p:Version='${{ github.ref_name }}' .\Unscramber\Unscrambler.csproj
       - name: Pack
         run: dotnet pack --no-build --configuration Release --output ./artifacts .\Unscrambler\Unscrambler.csproj
       - name: Publish to NuGet
