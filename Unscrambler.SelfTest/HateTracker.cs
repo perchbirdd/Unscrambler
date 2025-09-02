@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Dalamud.Plugin.Services;
 
 namespace Unscrambler.SelfTest;
@@ -38,8 +38,9 @@ public class HateTracker : IDisposable
                 haters++;
             }
         }
-
+        
         _state.TargetingHaters = haters;
+        // _state.TargetingHaters = 0;
     }
     
     

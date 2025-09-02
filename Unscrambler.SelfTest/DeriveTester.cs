@@ -17,16 +17,17 @@ public class DeriveTester
     private delegate nint DerivePrototype(byte set, byte seed1, byte seed2, uint epoch);
     private DerivePrototype _deriveFunc;
 
-    private const string _725x2Sig = "48 89 74 24 ?? 57 41 0F B6 F8";
-    private const string _725x3Sig = "48 89 74 24 ?? 57 41 0F B6 F0";
-    private const string _73Sig = "E8 ?? ?? ?? ?? 03 44 24 54 03 C3";
+    // private const string _725x2Sig = "48 89 74 24 ?? 57 41 0F B6 F8";
+    // private const string _725x3Sig = "48 89 74 24 ?? 57 41 0F B6 F0";
+    // private const string _73Sig = "E8 ?? ?? ?? ?? 03 44 24 54 03 C3";
+    private const string _731Sig = "E8 ?? ?? ?? ?? 03 44 24 54";
     
     public DeriveTester(MultiSigScanner scanner, IPluginLog log)
     {
         _log = log;
         _generator = KeyGeneratorFactory.ForGameVersion(Plugin.GameVersion);
 
-        var derivePtr = scanner.ScanText(_73Sig);
+        var derivePtr = scanner.ScanText(_731Sig);
         // _deriveHook = _hooks.HookFromAddress<DerivePrototype>(derivePtr, DeriveDetour);
         _deriveFunc = Marshal.GetDelegateForFunctionPointer<DerivePrototype>(derivePtr);
     }
