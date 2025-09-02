@@ -1,0 +1,27 @@
+﻿name: Publish to NuGet
+
+on:
+  push:
+    tags-ignore:
+      - testing_*
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+      - name: Restore dependencies
+        run: dotnet restore
+      - name: Build
+        run: |
+          $ver = '${{ github.ref_name }}'
+          dotnet build --no-restore --configuration Release -p:Version=$ver
+      - name: Pack
+        run: dotnet pack --no-build --configuration Release --output ./artifacts .\Unscrambler\Unscrambler.csproj
+      - name: Publish to NuGet
+        run: dotnet nuget push ./artifacts/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate

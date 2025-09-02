@@ -6,7 +6,34 @@
         <Nullable>enable</Nullable>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
+    
+    <PropertyGroup>
+        <PackageId>Unscrambler</PackageId>
+        <Version>1.0.0</Version>
+        <Authors>perchbird</Authors>
+        <Description>A library for reversing packet obfuscation in an online game.</Description>
+        <PackageLicenseExpression>WTFPL</PackageLicenseExpression>
+        <PackageProjectUrl>https://github.com/perchbirdd/unscrambler</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/perchbirdd/unscrambler</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PackageTags>unscrambler;data;utility</PackageTags>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
+        <EmbedUntrackedSources>true</EmbedUntrackedSources>
+        <IncludeSourceRevisionInInformationalVersion>true</IncludeSourceRevisionInInformationalVersion>
+        <Deterministic>true</Deterministic>
+    </PropertyGroup>
 
+    <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
+        <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All"/>
+    </ItemGroup>
+    
     <ItemGroup>
         <None Remove="Data\**"/>
         <EmbeddedResource Include="Data\2025.03.18.0000.0000\daytable.bin" LogicalName="2025.03.18.0000.0000.daytable.bin"/>
