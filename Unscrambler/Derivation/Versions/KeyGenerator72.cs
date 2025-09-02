@@ -22,6 +22,13 @@ public class KeyGenerator72 : IKeyGenerator
         Keys = new byte[3];
         LoadTables(tableBinaryBasePath);
     }
+    
+    public void Initialize(VersionConstants constants, byte[] table0, byte[] table1, byte[] table2, byte[] midTable, byte[] dayTable, byte[]? opcodeKeyTable = null)
+    {
+        _constants = constants;
+        Keys = new byte[3];
+        LoadTables(table0, table1, table2, midTable, dayTable);
+    }
 
     private static byte[] GetResource(string name)
     {

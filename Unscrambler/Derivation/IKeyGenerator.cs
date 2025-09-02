@@ -12,6 +12,18 @@ public interface IKeyGenerator
     void Initialize(VersionConstants constants, string? tableBinaryBasePath = null);
     
     /// <summary>
+    /// Initialize this IKeyGenerator directly from in-memory table binaries.
+    /// </summary>
+    /// <param name="constants">The constants to use to initialize this IKeyGenerator.</param>
+    /// <param name="table0">The Table0 byte array.</param>
+    /// <param name="table1">The Table1 byte array.</param>
+    /// <param name="table2">The Table2 byte array.</param>
+    /// <param name="midTable">The MidTable byte array.</param>
+    /// <param name="dayTable">The DayTable byte array.</param>
+    /// <param name="opcodeKeyTable">The optional OpcodeKeyTable byte array, required for FFXIV versions 7.3 and later.</param>
+    void Initialize(VersionConstants constants, byte[] table0, byte[] table1, byte[] table2, byte[] midTable, byte[] dayTable, byte[]? opcodeKeyTable = null);
+    
+    /// <summary>
     /// Generate packet obfuscation keys from an InitZone packet. 
     /// </summary>
     /// <param name="initZonePacket">The initzone packet, starting from after the packet header, sometimes called
