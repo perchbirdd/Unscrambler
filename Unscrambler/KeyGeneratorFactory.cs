@@ -36,7 +36,8 @@ public abstract class KeyGeneratorFactory
             "2025.07.30.0000.0000" => new KeyGenerator73(),
             "2025.08.07.0000.0000" => new KeyGenerator73(),
             "2025.08.22.0000.0000" => new KeyGenerator73(),
-            _ => new KeyGenerator73()
+            "2025.09.04.0000.0000" => new KeyGenerator73(),
+            _ => throw new ArgumentException($"Unsupported game version: {constants.GameVersion}")
         };
 
     private static IKeyGenerator Create(VersionConstants constants, string? tableBinaryBasePath = null)
