@@ -434,6 +434,17 @@ This is the only major change to the obfuscation in 7.3.
 
 # Using the library
 
+## Installing
+
+In the past, the library was only available via submodule. Now, the library is available via NuGet!
+
+The versioning of the library is based on the game version. It will follow the format: "major.minor.hotfix.libVersion".
+For example, the initial library version for 7.2 would be 7.2.0.0. 7.25 would be 7.25.0.0. After 1 hotfix on 7.25, the
+library would become version 7.25.1.0. If there were updates or fixes to the library after that, the version would 
+become 7.25.1.1.
+
+## In code
+
 The functionality is condensed into two classes, `KeyGenerator` and `Unscrambler`.
 
 You obtain a `KeyGenerator` like so:
