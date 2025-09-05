@@ -15,6 +15,9 @@ public class QueuedPacket
     
     public byte[]? UnscramblerData { get; set; }
     public string UnscramblerDataHash { get; set; }
+    
+    public byte[]? UnscramblerData2 { get; set; }
+    public string UnscramblerDataHash2 { get; set; }
 
     public QueuedPacket() {}
 

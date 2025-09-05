@@ -17,10 +17,29 @@ public unsafe class Unscrambler73 : IUnscrambler
         // 7.3 requires the opcode-based key
         throw new NotImplementedException("The opcode-based key is required for 7.3 Unscrambler implementations.");
     }
+    
+    public void Unscramble(Span<byte> input, byte key0, byte key1, byte key2, Span<int> opcodeKeyTable)
+    {
+        if (key0 == 0 && key1 == 0 && key2 == 0) return;
+
+        if (opcodeKeyTable is { Length: 0 }) return;
+        
+        Span<uint> keys = stackalloc uint[3];
+        keys[0] = key0;
+        keys[1] = key1;
+        keys[2] = key2;
+        
+        var opcode = OpcodeUtility.GetOpcodeFromPacketAtIpcStart(input);
+        
+        var baseKey = keys[opcode % 3];
+        var opcodeKeyTableIndex = (opcode + baseKey) % opcodeKeyTable.Length;
+        var opcodeBasedKey = opcodeKeyTable[(int)opcodeKeyTableIndex];
+        
+        UnscrambleInternal(input, opcode, (byte) baseKey, opcodeBasedKey);
+    }
 
     public void Unscramble(Span<byte> input, byte key0, byte key1, byte key2, int opcodeBasedKey)
     {
-        // Ditch - something is uninitialized, and there's no way to know if it's on purpose or not
         if (key0 == 0 && key1 == 0 && key2 == 0 && opcodeBasedKey == 0) return;
         
         Span<uint> keys = stackalloc uint[3];
@@ -30,7 +49,13 @@ public unsafe class Unscrambler73 : IUnscrambler
         
         var opcode = OpcodeUtility.GetOpcodeFromPacketAtIpcStart(input);
         
-        var baseKey = (byte) keys[opcode % 3];
+        var baseKey = keys[opcode % 3];
+        
+        UnscrambleInternal(input, opcode, (byte) baseKey, opcodeBasedKey);
+    }
+    
+    private void UnscrambleInternal(Span<byte> input, ushort opcode, byte baseKey, int opcodeBasedKey)
+    {
         var data = (byte*)Unsafe.AsPointer(ref input[0]);
         
         switch (true)

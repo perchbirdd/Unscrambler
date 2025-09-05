@@ -11,6 +11,18 @@ public unsafe class Unscrambler72 : IUnscrambler
     {
         _constants = constants;
     }
+    
+    public void Unscramble(Span<byte> input, byte key0, byte key1, byte key2, int opcodeBasedKey)
+    {
+        // 7.2 does not use the opcode-based key
+        Unscramble(input, key0, key1, key2);
+    }
+    
+    public void Unscramble(Span<byte> input, byte key0, byte key1, byte key2, Span<int> opcodeKeyTable)
+    {
+        // 7.2 does not use the opcode-based key
+        Unscramble(input, key0, key1, key2);
+    }
 
     public void Unscramble(Span<byte> input, byte key0, byte key1, byte key2)
     {
@@ -212,12 +224,6 @@ public unsafe class Unscrambler72 : IUnscrambler
                 break;
             }
         }
-    }
-
-    public void Unscramble(Span<byte> input, byte key0, byte key1, byte key2, int opcodeBasedKey)
-    {
-        // 7.2 does not use the opcode-based key
-        Unscramble(input, key0, key1, key2);
     }
 
     private void UnscrambleStatusEffectList(byte* data, byte baseKey, int opOffset)

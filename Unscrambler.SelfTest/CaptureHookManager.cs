@@ -174,7 +174,8 @@ public unsafe class CaptureHookManager : IDisposable
 			queuedPacket.GameData = data.ToArray();
 			queuedPacket.GameDataHash = HashPacket(queuedPacket.GameData);
 			
-			if (queuedPacket.GameDataHash == queuedPacket.UnscramblerDataHash)
+			if (queuedPacket.GameDataHash == queuedPacket.UnscramblerDataHash
+			    && queuedPacket.GameDataHash == queuedPacket.UnscramblerDataHash2)
 			{
 				_state.MarkOpcode(queuedPacket.Opcode, true);
 				_testDataManager.Save(opcode, queuedPacket.ScrambledData, queuedPacket.UnscramblerData);
@@ -322,6 +323,7 @@ public unsafe class CaptureHookManager : IDisposable
 	            // If you don't, you may update keys before a packet prior to the InitZone could be unscrambled
 	            queuedPacket.ScrambledData = pktData.ToArray();
 	            queuedPacket.UnscramblerData = pktData.ToArray();
+	            queuedPacket.UnscramblerData2 = pktData.ToArray();
 	            if (_keyGenerator.ObfuscationEnabled || _obfuscationOverride)
 	            {
 		            _log.Verbose($"unscrambling {opcode:X}");
@@ -332,8 +334,16 @@ public unsafe class CaptureHookManager : IDisposable
 			            _keyGenerator.Keys[1],
 			            _keyGenerator.Keys[2],
 			            _state.OpcodeBasedKey);
+		            
+		            _unscrambler.Unscramble(
+			            queuedPacket.UnscramblerData2,
+			            _keyGenerator.Keys[0],
+			            _keyGenerator.Keys[1],
+			            _keyGenerator.Keys[2],
+			            _state.OpcodeKeyTable);
 	            }
 	            queuedPacket.UnscramblerDataHash = HashPacket(queuedPacket.UnscramblerData);
+	            queuedPacket.UnscramblerDataHash2 = HashPacket(queuedPacket.UnscramblerData2);
 	            
 	            _zoneRxIpcQueue.Enqueue(queuedPacket);
             }
