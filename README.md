@@ -338,7 +338,7 @@ LABEL_110:
   switch ( opcodeMinus101 ) // Begin packet handler switch
 ```
 
-Do you see it? Prior to this CreateTarget, as it's known, being called, the pointer to the deobfuscated data actually 
+Prior to this CreateTarget, as it's known, being called, the pointer to the deobfuscated data actually 
 ends up in `rsi`. This means that if you can access `rsi` from a hook, you can simply read the deobfuscated packet 
 from the pointer, deobfuscated by the game, always 100% correct. The problem that the community has encountered is 
 that `rsi` might not be maintained between different applications hooking the same callsite - and libraries that 
@@ -476,6 +476,15 @@ unscrambler.Unscramble(packetData, keyGenerator.Keys[0], keyGenerator.Keys[1], k
 ```
 The unscrambler will deobfuscate the packet in-place. Note that the provided data must start at the IPC header. Not 
 after the IPC header, but at the IPC header, as the function will obtain the opcode by accessing `data[2]`.
+
+## Bypassing the KeyGenerator
+
+With library version 7.31.1.0 for game version 2025.09.04.0000.0000/7.31 hotfix 1, the KeyGenerator is technically 
+optional. If you would like, you can read keys directly from the game's PacketDispatcher class, and read the opcode key
+table from memory. In this case, you can obtain an IUnscrambler via the UnscramblerFactory API or create your own
+and initialize it with a constants object with only the opcode dictionary set, as that's all an IUnscrambler needs. From
+there, you would use the signature that accepts the opcodeKeyTable `Span<int>` parameter, and the IUnscrambler 
+will handle calculating the correct opcodeBasedKey and using that for deobfuscation.
 
 ## Extra considerations
 
