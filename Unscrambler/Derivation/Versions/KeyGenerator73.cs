@@ -22,6 +22,13 @@ public class KeyGenerator73 : IKeyGenerator
         Keys = new byte[3];
         LoadTables(tableBinaryBasePath);
     }
+    
+    public void Initialize(VersionConstants constants, byte[] table0, byte[] table1, byte[] table2, byte[] midTable, byte[] dayTable, byte[]? opcodeKeyTable = null)
+    {
+        _constants = constants;
+        Keys = new byte[3];
+        LoadTables(table0, table1, table2, midTable, dayTable, opcodeKeyTable ?? throw new ArgumentNullException(nameof(opcodeKeyTable)));
+    }
 
     private static byte[] GetResource(string name)
     {
@@ -39,14 +46,16 @@ public class KeyGenerator73 : IKeyGenerator
         byte[] tTable1;
         byte[] tTable2;
         byte[] tOpcodeKeyTable;
+        byte[] tMidTable;
+        byte[] tDayTable;
         
         if (basePath == null)
         {
             tTable0 = GetResource($"{_constants.GameVersion}.table0.bin");
             tTable1 = GetResource($"{_constants.GameVersion}.table1.bin");
             tTable2 = GetResource($"{_constants.GameVersion}.table2.bin");
-            _midTable = GetResource($"{_constants.GameVersion}.midtable.bin");
-            _dayTable = GetResource($"{_constants.GameVersion}.daytable.bin");
+            tMidTable = GetResource($"{_constants.GameVersion}.midtable.bin");
+            tDayTable = GetResource($"{_constants.GameVersion}.daytable.bin");
             tOpcodeKeyTable = GetResource($"{_constants.GameVersion}.opcodekeytable.bin");
         }
         else
@@ -54,27 +63,34 @@ public class KeyGenerator73 : IKeyGenerator
             tTable0 = File.ReadAllBytes(Path.Combine(basePath, "table0.bin"));
             tTable1 = File.ReadAllBytes(Path.Combine(basePath, "table1.bin"));
             tTable2 = File.ReadAllBytes(Path.Combine(basePath, "table2.bin"));
-            _midTable = File.ReadAllBytes(Path.Combine(basePath, "midtable.bin"));
-            _dayTable = File.ReadAllBytes(Path.Combine(basePath, "daytable.bin"));
+            tMidTable = File.ReadAllBytes(Path.Combine(basePath, "midtable.bin"));
+            tDayTable = File.ReadAllBytes(Path.Combine(basePath, "daytable.bin"));
             tOpcodeKeyTable = File.ReadAllBytes(Path.Combine(basePath, "opcodekeytable.bin"));
         }
 
-        _table0 = new int[tTable0.Length / 4];
-        _table1 = new int[tTable1.Length / 4];
-        _table2 = new int[tTable2.Length / 4];
-        _opcodeKeyTable = new int[tOpcodeKeyTable.Length / 4];
+        LoadTables(tTable0, tTable1, tTable2, tMidTable, tDayTable, tOpcodeKeyTable);
+    }
+    
+    private void LoadTables(byte[] table0, byte[] table1, byte[] table2, byte[] midTable, byte[] dayTable, byte[] opcodeKeyTable)
+    {
+        _table0 = new int[table0.Length / 4];
+        _table1 = new int[table1.Length / 4];
+        _table2 = new int[table2.Length / 4];
+        _opcodeKeyTable = new int[opcodeKeyTable.Length / 4];
+        _midTable = midTable;
+        _dayTable = dayTable;
         
-        for (int i = 0; i < tTable0.Length; i += 4)
-            _table0[i / 4] = BitConverter.ToInt32(tTable0, i);
+        for (int i = 0; i < table0.Length; i += 4)
+            _table0[i / 4] = BitConverter.ToInt32(table0, i);
         
-        for (int i = 0; i < tTable1.Length; i += 4)
-            _table1[i / 4] = BitConverter.ToInt32(tTable1, i);
+        for (int i = 0; i < table1.Length; i += 4)
+            _table1[i / 4] = BitConverter.ToInt32(table1, i);
             
-        for (int i = 0; i < tTable2.Length; i += 4)
-            _table2[i / 4] = BitConverter.ToInt32(tTable2, i);
+        for (int i = 0; i < table2.Length; i += 4)
+            _table2[i / 4] = BitConverter.ToInt32(table2, i);
 
-        for (int i = 0; i < tOpcodeKeyTable.Length; i += 4)
-            _opcodeKeyTable[i / 4] = BitConverter.ToInt32(tOpcodeKeyTable, i);
+        for (int i = 0; i < opcodeKeyTable.Length; i += 4)
+            _opcodeKeyTable[i / 4] = BitConverter.ToInt32(opcodeKeyTable, i);
     }
     
     public void GenerateFromInitZone(Span<byte> initZonePacket)
