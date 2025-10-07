@@ -58,7 +58,8 @@ public unsafe class PluginState
     private static byte[] ReadResourceFromAssembly(string assemblyFileName, string resourceName)
     {
         var assemblyPath = Path.Combine(Plugin.PluginInterface.AssemblyLocation.DirectoryName!, assemblyFileName);
-        var assembly = Assembly.LoadFrom(assemblyPath);
+        var bytes = File.ReadAllBytes(assemblyPath);
+        var assembly = Assembly.Load(bytes);
         
         using var resourceStream = assembly.GetManifestResourceStream(resourceName);
         if (resourceStream == null)

@@ -52,6 +52,8 @@ public class VersionConstants
         Constants.Add(_731.GameVersion, _731);
         var _731h1 = GameConstants.For731h1();
         Constants.Add(_731h1.GameVersion, _731h1);
+        var _735 = GameConstants.For735();
+        Constants.Add(_735.GameVersion, _735);
     }
 
     public static VersionConstants ForGameVersion(string gameVersion)
