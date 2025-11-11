@@ -28,6 +28,8 @@ public class Program
             Console.WriteLine($"Config for version {version} not found.");
             return;
         }
+        
+        Console.WriteLine($"Generating data for {version}");
 
         var data = File.ReadAllBytes(args[0]);
         var peFile = new PeFile(data);
@@ -55,6 +57,8 @@ public class Program
     
     private static void DumpArray(byte[] data, long offset, int length, string path)
     {
+        if (File.Exists(path)) 
+            File.Delete(path);
         var f = File.OpenWrite(path);
         for (int i = 0; i < length; i++)
         {

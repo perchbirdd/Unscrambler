@@ -119,5 +119,12 @@
         <EmbeddedResource Include="Data\2025.10.13.0000.0000\table1.bin" LogicalName="2025.10.13.0000.0000.table1.bin"/>
         <EmbeddedResource Include="Data\2025.10.13.0000.0000\table2.bin" LogicalName="2025.10.13.0000.0000.table2.bin"/>
         <EmbeddedResource Include="Data\2025.10.13.0000.0000\opcodekeytable.bin" LogicalName="2025.10.13.0000.0000.opcodekeytable.bin"/>
+        
+        <EmbeddedResource Include="Data\2025.10.30.0000.0000\daytable.bin" LogicalName="2025.10.30.0000.0000.daytable.bin"/>
+        <EmbeddedResource Include="Data\2025.10.30.0000.0000\midtable.bin" LogicalName="2025.10.30.0000.0000.midtable.bin"/>
+        <EmbeddedResource Include="Data\2025.10.30.0000.0000\table0.bin" LogicalName="2025.10.30.0000.0000.table0.bin"/>
+        <EmbeddedResource Include="Data\2025.10.30.0000.0000\table1.bin" LogicalName="2025.10.30.0000.0000.table1.bin"/>
+        <EmbeddedResource Include="Data\2025.10.30.0000.0000\table2.bin" LogicalName="2025.10.30.0000.0000.table2.bin"/>
+        <EmbeddedResource Include="Data\2025.10.30.0000.0000\opcodekeytable.bin" LogicalName="2025.10.30.0000.0000.opcodekeytable.bin"/>
     </ItemGroup>
 </Project>
