@@ -237,15 +237,22 @@ public unsafe class Unscrambler72 : IUnscrambler
 
     private void UnscrambleNpcSpawn(byte* data, byte baseKey, uint weirdConst)
     {
+        // BNPC Base
         *(uint*)(data +  80) -= baseKey;
+        // BNPC Name
         *(uint*)(data +  84) -= baseKey;
+        // Unused, unknown
         *(uint*)(data +  88) -= baseKey;
+        // Companion Owner
         *(uint*)(data +  96) -= baseKey;
+        // Event
         *(uint*)(data + 100) -= baseKey;
+        // Tether
         *(uint*)(data + 108) ^= weirdConst;
                 
         var opOffset = 168;
                 
+        // Status effects
         for (int i = 0; i < 30; i++)
         {
             var offset = opOffset + i * 12;
