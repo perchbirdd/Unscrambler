@@ -64,8 +64,8 @@ public unsafe class Unscrambler73 : IUnscrambler
             case true when opcode == _constants.ObfuscatedOpcodes["PlayerSpawn"]:
             {
                 *(ulong*)(data + 24) -= baseKey;  // Content ID
-                *(ushort*)(data + 36) -= baseKey; // Home world 
-                *(ushort*)(data + 38) -= baseKey; // Current world
+                *(ushort*)(data + 36) -= baseKey; // Current world
+                *(ushort*)(data + 38) -= baseKey; // Home world
                 
                 // Name
                 const int nameOffset = 610;
