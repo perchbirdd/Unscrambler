@@ -28,6 +28,8 @@ public interface IKeyGenerator
     /// </summary>
     /// <param name="initZonePacket">The initzone packet, starting from after the packet header, sometimes called
     /// the segment header.</param>
+    /// <exception cref="NotImplementedException">If this IKeyGenerator was provided for
+    /// version 7.4 / 2025.12.09.0000.0000 or later.</exception>
     void GenerateFromInitZone(Span<byte> initZonePacket);
     
     /// <summary>

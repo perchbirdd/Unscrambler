@@ -14,7 +14,7 @@ public class TestDataManager
     private HashSet<int> _opcodesToSave;
     private Dictionary<int, string> _opcodeNames;
 
-    private Guid _initZoneId;
+    private Guid _initPacketId;
     private string _pathForSession;
     
     public TestDataManager(string path, VersionConstants constants)
@@ -40,10 +40,18 @@ public class TestDataManager
     
     public void SaveInitZone(Span<byte> initZonePacket)
     {
-        _initZoneId = Guid.NewGuid();
-        _pathForSession = Path.Combine(_path, _initZoneId.ToString());
+        _initPacketId = Guid.NewGuid();
+        _pathForSession = Path.Combine(_path, _initPacketId.ToString());
         Directory.CreateDirectory(_pathForSession);
-        File.WriteAllBytes(Path.Combine(_pathForSession, $"InitZone-{_initZoneId}.dat"), initZonePacket);
+        File.WriteAllBytes(Path.Combine(_pathForSession, $"InitZone-{_initPacketId}.dat"), initZonePacket);
+    }
+    
+    public void SaveUnknownInit(Span<byte> unknownInitPacket)
+    {
+        _initPacketId = Guid.NewGuid();
+        _pathForSession = Path.Combine(_path, _initPacketId.ToString());
+        Directory.CreateDirectory(_pathForSession);
+        File.WriteAllBytes(Path.Combine(_pathForSession, $"UnknownInit-{_initPacketId}.dat"), unknownInitPacket);
     }
 
     public void Save(int opcode, byte[] obfuscatedData, byte[] deobfuscatedData)

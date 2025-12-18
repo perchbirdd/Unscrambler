@@ -15,7 +15,7 @@ namespace Unscrambler.SelfTest;
 public unsafe class CaptureHookManager : IDisposable
 {
 	private const string GenericRxSignature = "E8 ?? ?? ?? ?? 4C 8B 4F 10 8B 47 1C 45";
-	private const string OtherCreateTargetCaller = "48 89 5C 24 ?? 48 89 74 24 ?? 57 48 83 EC 50 48 8B FA 48 8B F1 0F B7 12";
+	private const string OtherCreateTargetCaller = "E8 ?? ?? ?? ?? 80 BB ?? ?? ?? ?? ?? 77 9A";
 	private const string CreateTargetSignature = "3B 0D ?? ?? ?? ?? 74 0E";
 	
 	private delegate nuint RxPrototype(byte* data, byte* a2, nuint a3, nuint a4, nuint a5);
@@ -174,6 +174,13 @@ public unsafe class CaptureHookManager : IDisposable
 			queuedPacket.GameData = data.ToArray();
 			queuedPacket.GameDataHash = HashPacket(queuedPacket.GameData);
 			
+			var scrambledHash = HashPacket(queuedPacket.ScrambledData);
+			if (scrambledHash == queuedPacket.GameDataHash)
+			{
+				if (queuedPacket.Opcode != Plugin.Constants.ObfuscatedOpcodes["ActorControl"])
+					_log.Error($"A tracked packet {queuedPacket.Opcode} ({queuedPacket.Opcode:X}) had no changes after the game's unscramble process!");
+			}
+			
 			if (queuedPacket.GameDataHash == queuedPacket.UnscramblerDataHash
 			    && queuedPacket.GameDataHash == queuedPacket.UnscramblerDataHash2)
 			{
@@ -300,6 +307,26 @@ public unsafe class CaptureHookManager : IDisposable
 		            _testDataManager.SaveInitZone(pktData);
 		            _log.Verbose($"generating keys");
 		            _keyGenerator.GenerateFromInitZone(pktData);
+		            _state.ObfuscationEnabled = _keyGenerator.ObfuscationEnabled;
+		            _state.GeneratedKey1 = _keyGenerator.Keys[0];
+		            _state.GeneratedKey2 = _keyGenerator.Keys[1];
+		            _state.GeneratedKey3 = _keyGenerator.Keys[2];
+		            _state.KeysFromDispatcher = false;
+		            _obfuscationOverride = false;
+	            }
+	            catch (Exception e)
+	            {
+		            _log.Error(e, "Failed to generate keys");
+	            }
+            }
+            
+            if (opcode == Plugin.Constants.UnknownObfuscationInitOpcode)
+            {
+	            try
+	            {
+		            _testDataManager.SaveUnknownInit(pktData);
+		            _log.Verbose($"generating keys");
+		            _keyGenerator.GenerateFromUnknownInitializer(pktData);
 		            _state.ObfuscationEnabled = _keyGenerator.ObfuscationEnabled;
 		            _state.GeneratedKey1 = _keyGenerator.Keys[0];
 		            _state.GeneratedKey2 = _keyGenerator.Keys[1];

@@ -11,6 +11,8 @@ A library for deobfuscating packets for Final Fantasy XIV.
 
   - [7.3 Changes](#73-changes)
   - [7.3 API Updates](#73-api-updates)
+  - [7.4 Changes](#74-changes)
+  - [7.4 API Updates](#74-api-updates)
 
 - [Using the library](#using-the-library)
 
@@ -431,6 +433,22 @@ This is the only major change to the obfuscation in 7.3.
 - There is now an `OpcodeUtility` class that provides methods for working with opcodes. At the moment, it contains two
   methods, both of which return the opcode of a packet. `GetOpcodeFromPacketAtPacketStart` expects the provided
   Span to start at the packet header. `GetOpcodeFromPacketAtIpcStart` expects the Span to start at the IPC header.
+
+## 7.4 Changes
+
+Patch 7.4 brought one major change to the obfuscation. Previously, the InitZone packet, sent on every zone change, would
+include the seed values required to generate keys. Another packet was able to initialize the obfuscation, but I had never
+seen it used. Now this packet is the only way to initialize the obfuscation, and InitZone no longer includes the
+seed values. Note that this packet is not necessarily sent on *every* zone change, so some zone changes may not incur a
+key change.
+
+### 7.4 API Updates
+
+- IKeyGenerator has a new implementation for 7.4 while IUnscrambler does not.
+- IKeyGenerator will now throw an exception when attempting to generate keys from InitZone packets in version 7.4 (
+  2025.12.09.0000.0000) and later. This method will not be deprecated as it is still valid for 7.38 and earlier.
+- InitZone opcodes may not be included in further VersionConstants objects.
+
 
 # Using the library
 

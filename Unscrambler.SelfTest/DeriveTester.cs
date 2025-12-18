@@ -22,14 +22,15 @@ public class DeriveTester
     // private const string _73Sig = "E8 ?? ?? ?? ?? 03 44 24 54 03 C3";
     // private const string _731Sig = "E8 ?? ?? ?? ?? 03 44 24 54";
     // private const string _735x1Sig = "48 89 74 24 ?? 57 41 0F B6 F8";
-    private const string _738Sig = "E8 ?? ?? ?? ?? 03 44 24 54 03 C3";
+    // private const string _738Sig = "E8 ?? ?? ?? ?? 03 44 24 54 03 C3";
+    private const string _74Sig = "E8 ?? ?? ?? ?? 03 C3 03 44 24 64";
     
     public DeriveTester(MultiSigScanner scanner, IPluginLog log)
     {
         _log = log;
         _generator = KeyGeneratorFactory.ForGameVersion(Plugin.GameVersion);
 
-        var derivePtr = scanner.ScanText(_738Sig);
+        var derivePtr = scanner.ScanText(_74Sig);
         // _deriveHook = _hooks.HookFromAddress<DerivePrototype>(derivePtr, DeriveDetour);
         _deriveFunc = Marshal.GetDelegateForFunctionPointer<DerivePrototype>(derivePtr);
     }
@@ -122,7 +123,7 @@ public class DeriveTester
 
     private byte GeneratorDerive(byte set, byte seed1, byte seed2, uint epoch)
     {
-        var deriveMethod = typeof(KeyGenerator73).GetMethod("Derive", BindingFlags.NonPublic | BindingFlags.Instance);
+        var deriveMethod = typeof(KeyGenerator74).GetMethod("Derive", BindingFlags.NonPublic | BindingFlags.Instance);
         return (byte) deriveMethod.Invoke(_generator,  parameters: [set, seed1, seed2, epoch]); //set, nseed1, nseed2, epoch
     }
 }

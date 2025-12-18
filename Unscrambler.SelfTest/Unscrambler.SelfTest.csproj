@@ -1,4 +1,4 @@
-<Project Sdk="Dalamud.NET.Sdk/13.0.0">
+<Project Sdk="Dalamud.NET.Sdk/14.0.0">
   <PropertyGroup>
     <Version>0.0.0.1</Version>
     <PackageLicenseExpression>AGPL-3.0-or-later</PackageLicenseExpression>
@@ -30,6 +30,7 @@
       <HintPath>$(DalamudLibPath)Reloaded.Memory.dll</HintPath>
       <Private>false</Private>
     </Reference>
+    <PackageReference Update="DalamudPackager" Version="14.0.0" />
   </ItemGroup>
 
   <ItemGroup>
