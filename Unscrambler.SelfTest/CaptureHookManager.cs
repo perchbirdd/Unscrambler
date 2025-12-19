@@ -299,26 +299,6 @@ public unsafe class CaptureHookManager : IDisposable
 
             var opcode = OpcodeUtility.GetOpcodeFromPacketAtIpcStart(pktData);
             queuedPacket.Opcode = opcode;
-
-            if (opcode == Plugin.Constants.InitZoneOpcode)
-            {
-	            try
-	            {
-		            _testDataManager.SaveInitZone(pktData);
-		            _log.Verbose($"generating keys");
-		            _keyGenerator.GenerateFromInitZone(pktData);
-		            _state.ObfuscationEnabled = _keyGenerator.ObfuscationEnabled;
-		            _state.GeneratedKey1 = _keyGenerator.Keys[0];
-		            _state.GeneratedKey2 = _keyGenerator.Keys[1];
-		            _state.GeneratedKey3 = _keyGenerator.Keys[2];
-		            _state.KeysFromDispatcher = false;
-		            _obfuscationOverride = false;
-	            }
-	            catch (Exception e)
-	            {
-		            _log.Error(e, "Failed to generate keys");
-	            }
-            }
             
             if (opcode == Plugin.Constants.UnknownObfuscationInitOpcode)
             {
