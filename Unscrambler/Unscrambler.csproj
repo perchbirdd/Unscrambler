@@ -37,7 +37,7 @@
     <ItemGroup>
         <None Remove="Data\**"/>
         <EmbeddedResource Include="Data\**\*.bin">
-            <LogicalName>$([System.String]::Copy('%(RecursiveDir)%(Filename)%(Extension)').Replace('\', '.'))</LogicalName>
+            <LogicalName>$([System.String]::Copy('%(RecursiveDir)%(Filename)%(Extension)').Replace('\', '.').Replace('/', '.'))</LogicalName>
         </EmbeddedResource>
     </ItemGroup>
 </Project>
