@@ -624,9 +624,9 @@ Important notices regarding data captured with this library will be posted here.
 ### ActorControl
 
 From
-[its release on April 7th](https://github.com/perchbirdd/Unscrambler/commit/c1c4d0254f2b228e5a786b0b657576b8f1f79ea8) 
+[its release on April 7th, 2025](https://github.com/perchbirdd/Unscrambler/commit/c1c4d0254f2b228e5a786b0b657576b8f1f79ea8) 
 until 
-[its update on May 27th](https://github.com/perchbirdd/Unscrambler/commit/2010d17f23ca7436a762aaff06c18fc4a2ade862), 
+[its update on May 27th, 2025](https://github.com/perchbirdd/Unscrambler/commit/2010d17f23ca7436a762aaff06c18fc4a2ade862), 
 this library did not handle deobfuscating ActorControl packets with the type `TargetIcon`, commonly known as 
 headmarkers. Any actor control packets with the TargetIcon type persisted on disk for later use must either be
 deobfuscated after-the-fact by regenerating keys from InitZone packets, deriving the keys some other way, or entirely 
@@ -635,9 +635,18 @@ ignored. I apologize for any inconvenience.
 ### ActorCast
 
 From
-[its release on April 7th](https://github.com/perchbirdd/Unscrambler/commit/c1c4d0254f2b228e5a786b0b657576b8f1f79ea8)
+[its release on April 7th, 2025](https://github.com/perchbirdd/Unscrambler/commit/c1c4d0254f2b228e5a786b0b657576b8f1f79ea8)
 until
-[its update on August 5th](https://github.com/perchbirdd/Unscrambler/commit/c335cfb8b8c6bfabfe8273d8be703cfeaa6c602e),
+[its update on August 5th, 2025](https://github.com/perchbirdd/Unscrambler/commit/c335cfb8b8c6bfabfe8273d8be703cfeaa6c602e),
 this library did not handle deobfuscating ActorCast packets. Any actor cast packets persisted on disk for later use
 must either be deobfuscated after-the-fact by regenerating keys from InitZone packets, deriving the keys some other 
 way, or entirely ignored. I apologize for any inconvenience.
+
+### ActionEffect02
+
+From 
+[its release on December 25th, 2025](https://github.com/perchbirdd/Unscrambler/commit/37d4d17787710584843b54ce74bf4845e2bdbce6)
+until
+[its update on January 27th, 2026](),
+this library had the incorrect opcode for ActionEffect02 for 7.4 hotfix 2, game version 2025.12.23.0000.0000.
+Although this opcode is not actually sent to the client, I apologize for any inconvenience. 
