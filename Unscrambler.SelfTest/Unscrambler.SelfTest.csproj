@@ -14,16 +14,8 @@
     <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.106">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <Reference Include="Reloaded.Hooks">
-      <HintPath>$(DalamudLibPath)Reloaded.Hooks.dll</HintPath>
-      <Private>false</Private>
-    </Reference>
     <Reference Include="Reloaded.Hooks.Definitions">
       <HintPath>$(DalamudLibPath)Reloaded.Hooks.Definitions.dll</HintPath>
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="Reloaded.Assembler">
-      <HintPath>$(DalamudLibPath)Reloaded.Assembler.dll</HintPath>
       <Private>false</Private>
     </Reference>
     <Reference Include="Reloaded.Memory">
