@@ -647,6 +647,6 @@ way, or entirely ignored. I apologize for any inconvenience.
 From 
 [its release on December 25th, 2025](https://github.com/perchbirdd/Unscrambler/commit/37d4d17787710584843b54ce74bf4845e2bdbce6)
 until
-[its update on January 27th, 2026](),
+[its update on January 27th, 2026](https://github.com/perchbirdd/Unscrambler/commit/e7746d384abca1a36878314529cf508b85c5bd88),
 this library had the incorrect opcode for ActionEffect02 for 7.4 hotfix 2, game version 2025.12.23.0000.0000.
 Although this opcode is not actually sent to the client, I apologize for any inconvenience. 
