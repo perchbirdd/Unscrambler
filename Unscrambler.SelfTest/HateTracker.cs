@@ -5,16 +5,14 @@ namespace Unscrambler.SelfTest;
 
 public class HateTracker : IDisposable
 {
-    private IFramework _framework;
-    private IObjectTable _objectTable;
-    private IClientState _clientState;
-    private PluginState _state;
+    private readonly IFramework _framework;
+    private readonly IObjectTable _objectTable;
+    private readonly PluginState _state;
     
-    public HateTracker(IFramework framework, IObjectTable objectTable, IClientState clientState, PluginState state)
+    public HateTracker(IFramework framework, IObjectTable objectTable, PluginState state)
     {
         _framework = framework;
         _objectTable = objectTable;
-        _clientState = clientState;
         _state = state;
 
         _framework.Update += UpdateHaters;
@@ -27,7 +25,7 @@ public class HateTracker : IDisposable
 
     private void UpdateHaters(IFramework framework)
     {
-        var localPlayerId = _clientState.LocalPlayer?.GameObjectId;
+        var localPlayerId = _objectTable.LocalPlayer?.GameObjectId;
         if (!localPlayerId.HasValue) return;
 
         var haters = 0;

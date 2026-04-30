@@ -18,7 +18,6 @@ public sealed unsafe class Plugin : IDalamudPlugin
     [PluginService] internal static IPluginLog Log { get; private set; } = null!;
     [PluginService] internal static IFramework DalamudFramework { get; private set; } = null!;
     [PluginService] internal static IObjectTable ObjectTable { get; private set; } = null!;
-    [PluginService] internal static IClientState ClientState { get; private set; } = null!;
     
     public static string GameVersion { get; private set; }
     public static VersionConstants Constants { get; private set; }
@@ -50,7 +49,7 @@ public sealed unsafe class Plugin : IDalamudPlugin
         var testDataDir = Path.Combine(PluginInterface.GetPluginConfigDirectory(), GameVersion);
         var testDataManager = new TestDataManager(testDataDir, Constants);
 
-        _hateTracker = new HateTracker(DalamudFramework, ObjectTable, ClientState, _state);
+        _hateTracker = new HateTracker(DalamudFramework, ObjectTable, _state);
         
         var multiSigScanner = new MultiSigScanner(Log);
         _captureHookManager = new CaptureHookManager(Log, multiSigScanner, _state, Hooks, testDataManager);
