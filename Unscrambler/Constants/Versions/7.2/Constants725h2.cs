@@ -2,6 +2,7 @@
 
 public static partial class GameConstants
 {
+    [VersionConstant]
     public static VersionConstants For725h2()
     {
         return new VersionConstants

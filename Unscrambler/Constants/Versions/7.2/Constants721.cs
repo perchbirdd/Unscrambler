@@ -1,7 +1,8 @@
-﻿namespace Unscrambler.Constants.Versions;
+namespace Unscrambler.Constants.Versions;
 
 public static partial class GameConstants
 {
+    [VersionConstant]
     public static VersionConstants For721()
     {
         return new VersionConstants
