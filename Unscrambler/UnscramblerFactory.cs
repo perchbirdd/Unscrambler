@@ -46,6 +46,7 @@ public abstract class UnscramblerFactory
             "2026.06.18.0000.0000" => new Unscrambler73(),
             "2026.07.16.0001.0000" => new Unscrambler73(),
             "2026.08.05.0000.0000" => new Unscrambler73(),
+            "2026.08.11.0000.0000" => new Unscrambler73(),
             _ => throw new ArgumentException($"Unsupported game version: {constants.GameVersion}")
         };
         
