@@ -56,6 +56,7 @@ public abstract class KeyGeneratorFactory
             "2026.07.16.0001.0000" => new KeyGenerator74(),
             "2026.08.05.0000.0000" => new KeyGenerator74(),
             "2026.08.11.0000.0000" => new KeyGenerator74(),
+            "2026.09.01.0000.0000" => new KeyGenerator74(),
             _ => throw new ArgumentException($"Unsupported game version: {constants.GameVersion}")
         };
 
