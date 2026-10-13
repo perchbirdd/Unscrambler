@@ -14,7 +14,7 @@ namespace Unscrambler.SelfTest;
 
 public unsafe class CaptureHookManager : IDisposable
 {
-	private const string GenericRxSignature = "E8 ?? ?? ?? ?? 4C 8B 4F 10 8B 47 1C 45";
+	private const string GenericRxSignature = "E8 ?? ?? ?? ?? 4C 8B 47 10 44 8B 4F 1C 45";
 	private const string OtherCreateTargetCaller = "E8 ?? ?? ?? ?? 80 BB ?? ?? ?? ?? ?? 77 9A";
 	private const string CreateTargetSignature = "3B 0D ?? ?? ?? ?? 74 0E";
 	

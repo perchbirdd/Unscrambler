@@ -17,28 +17,28 @@ public class DeriveTester
     private delegate nint DerivePrototype(byte set, byte seed1, byte seed2, uint epoch);
     private DerivePrototype _deriveFunc;
 
-    // private const string _725x2Sig = "48 89 74 24 ?? 57 41 0F B6 F8";
-    // private const string _725x3Sig = "48 89 74 24 ?? 57 41 0F B6 F0";
-    // private const string _73Sig = "E8 ?? ?? ?? ?? 03 44 24 54 03 C3";
-    // private const string _731Sig = "E8 ?? ?? ?? ?? 03 44 24 54";
-    // private const string _735x1Sig = "48 89 74 24 ?? 57 41 0F B6 F8";
-    // private const string _738Sig = "E8 ?? ?? ?? ?? 03 44 24 54 03 C3";
-    // private const string _74Sig = "E8 ?? ?? ?? ?? 03 C3 03 44 24 64";
-    // private const string _74x2Sig = "48 89 74 24 ?? 57 41 0F B6 F0";
-    // private const string _741Sig = "E8 ?? ?? ?? ?? 03 44 24 68 03 C3";
-    // private const string _741x1Sig = "E8 ?? ?? ?? ?? 03 44 24 64 03 C3";
-    // private const string _745x1Sig = "E8 ?? ?? ?? ?? 03 44 24 64";
-    // private const string _751x1Sig = "48 89 74 24 ?? 57 41 0F B6 F0";
-    // private const string _751x2Sig = "E8 ?? ?? ?? ?? 03 44 24 64 03 C3";
-    private const string _755x1Sig = "E8 ?? ?? ?? ?? 03 44 24 64";
+    // private const string _deriveSig = "48 89 74 24 ?? 57 41 0F B6 F8"; // 7.25x2
+    // private const string _deriveSig = "48 89 74 24 ?? 57 41 0F B6 F0"; // 7.25x3
+    // private const string _deriveSig = "E8 ?? ?? ?? ?? 03 44 24 54 03 C3"; // 7.3
+    // private const string _deriveSig = "E8 ?? ?? ?? ?? 03 44 24 54"; // 7.31
+    // private const string _deriveSig = "48 89 74 24 ?? 57 41 0F B6 F8"; // 7.35x1
+    // private const string _deriveSig = "E8 ?? ?? ?? ?? 03 44 24 54 03 C3"; // 7.38
+    // private const string _deriveSig = "E8 ?? ?? ?? ?? 03 C3 03 44 24 64"; // 7.4
+    // private const string _deriveSig = "48 89 74 24 ?? 57 41 0F B6 F0"; // 7.4x2
+    // private const string _deriveSig = "E8 ?? ?? ?? ?? 03 44 24 68 03 C3"; // 7.41
+    // private const string _deriveSig = "E8 ?? ?? ?? ?? 03 44 24 64 03 C3"; // 7.41x1
+    // private const string _deriveSig = "E8 ?? ?? ?? ?? 03 44 24 64"; // 7.45x1
+    // private const string _deriveSig = "48 89 74 24 ?? 57 41 0F B6 F0"; // 7.51x1
+    // private const string _deriveSig = "E8 ?? ?? ?? ?? 03 44 24 64 03 C3"; // 7.51x2
+    // private const string _deriveSig = "E8 ?? ?? ?? ?? 03 44 24 64"; // 7.55x1
+    private const string _deriveSig = "48 89 74 24 ?? 57 41 0F B6 F0"; // 7.57
     
     public DeriveTester(MultiSigScanner scanner, IPluginLog log)
     {
         _log = log;
         _generator = KeyGeneratorFactory.ForGameVersion(Plugin.GameVersion);
 
-        var derivePtr = scanner.ScanText(_755x1Sig);
-        // _deriveHook = _hooks.HookFromAddress<DerivePrototype>(derivePtr, DeriveDetour);
+        var derivePtr = scanner.ScanText(_deriveSig);
         _deriveFunc = Marshal.GetDelegateForFunctionPointer<DerivePrototype>(derivePtr);
     }
 
