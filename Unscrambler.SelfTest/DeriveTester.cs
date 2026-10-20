@@ -31,7 +31,8 @@ public class DeriveTester
     // private const string _deriveSig = "48 89 74 24 ?? 57 41 0F B6 F0"; // 7.51x1
     // private const string _deriveSig = "E8 ?? ?? ?? ?? 03 44 24 64 03 C3"; // 7.51x2
     // private const string _deriveSig = "E8 ?? ?? ?? ?? 03 44 24 64"; // 7.55x1
-    private const string _deriveSig = "48 89 74 24 ?? 57 41 0F B6 F0"; // 7.57
+    // private const string _deriveSig = "48 89 74 24 ?? 57 41 0F B6 F0"; // 7.57
+    private const string _deriveSig = "E8 ?? ?? ?? ?? 03 44 24 64 03 C3"; // 7.57x1
     
     public DeriveTester(MultiSigScanner scanner, IPluginLog log)
     {
